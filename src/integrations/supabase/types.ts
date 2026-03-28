@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_log: {
+        Row: {
+          created_at: string
+          detected_flags: string[]
+          id: string
+          message_text: string
+          threat_level: string
+          user_id: string
+          user_mode: string
+        }
+        Insert: {
+          created_at?: string
+          detected_flags?: string[]
+          id?: string
+          message_text: string
+          threat_level: string
+          user_id: string
+          user_mode?: string
+        }
+        Update: {
+          created_at?: string
+          detected_flags?: string[]
+          id?: string
+          message_text?: string
+          threat_level?: string
+          user_id?: string
+          user_mode?: string
+        }
+        Relationships: []
+      }
+      stop_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: string[]
+          created_at: string
+          fully_completed: boolean
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: string[]
+          created_at?: string
+          fully_completed?: boolean
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: string[]
+          created_at?: string
+          fully_completed?: boolean
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      threats: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          examples: string[]
+          id: string
+          red_flags: string[]
+          severity: string
+          target_audience: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          examples?: string[]
+          id?: string
+          red_flags?: string[]
+          severity?: string
+          target_audience?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          examples?: string[]
+          id?: string
+          red_flags?: string[]
+          severity?: string
+          target_audience?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      training_progress: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          scenario_id: string
+          time_spent_seconds: number | null
+          user_fell_for_trap: boolean
+          user_id: string
+          user_mode: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          scenario_id: string
+          time_spent_seconds?: number | null
+          user_fell_for_trap?: boolean
+          user_id: string
+          user_mode?: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          scenario_id?: string
+          time_spent_seconds?: number | null
+          user_fell_for_trap?: boolean
+          user_id?: string
+          user_mode?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
