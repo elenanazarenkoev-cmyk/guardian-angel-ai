@@ -3,12 +3,18 @@ import { ShieldCheck } from "lucide-react";
 import VoiceButton from "@/components/VoiceButton";
 import UserModeToggle from "@/components/UserModeToggle";
 import MessageAnalyzer from "@/components/MessageAnalyzer";
+import ScenarioSimulator from "@/components/ScenarioSimulator";
+import StopProtocol from "@/components/StopProtocol";
 import ThreatIndicator from "@/components/ThreatIndicator";
+import NavLink from "@/components/NavLink";
 import { toast } from "sonner";
+
+type TabKey = "analyzer" | "training" | "stop";
 
 const Index = () => {
   const [userMode, setUserMode] = useState<"elderly" | "child">("elderly");
   const [voiceQuery, setVoiceQuery] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>("analyzer");
 
   const handleVoiceResult = useCallback((text: string) => {
     setVoiceQuery(text);
@@ -28,28 +34,29 @@ const Index = () => {
         </h1>
       </header>
 
-      <p className="text-center text-lg text-muted-foreground px-6 mb-6">
+      <p className="text-center text-lg text-muted-foreground px-6 mb-4">
         Ваш цифровой защитник от мошенников
       </p>
+
+      {/* Navigation tabs */}
+      <nav className="px-4 mb-4" aria-label="Основная навигация">
+        <div className="flex gap-2 max-w-lg mx-auto w-full">
+          <NavLink label="Анализ" icon="📬" isActive={activeTab === "analyzer"} onClick={() => setActiveTab("analyzer")} />
+          <NavLink label="Тренажёр" icon="🎓" isActive={activeTab === "training"} onClick={() => setActiveTab("training")} />
+          <NavLink label="S.T.O.P." icon="🛡️" isActive={activeTab === "stop"} onClick={() => setActiveTab("stop")} />
+        </div>
+      </nav>
 
       {/* Main content */}
       <main className="flex-1 px-4 pb-8 space-y-6 max-w-lg mx-auto w-full">
         {/* User mode selector */}
         <UserModeToggle mode={userMode} onChange={setUserMode} />
 
-        {/* Status indicator */}
-        <ThreatIndicator
-          level="safe"
-          message={userMode === "elderly" 
-            ? "Сейчас всё спокойно. Угроз нет." 
-            : "Всё хорошо! Ты в безопасности 😊"}
-        />
-
         {/* Voice control */}
         <VoiceButton
           onResult={handleVoiceResult}
-          promptText={userMode === "elderly" 
-            ? "🎤 Нажмите и спросите голосом" 
+          promptText={userMode === "elderly"
+            ? "🎤 Нажмите и спросите голосом"
             : "🎤 Нажми и спроси!"}
         />
 
@@ -60,8 +67,26 @@ const Index = () => {
           </div>
         )}
 
-        {/* Message analyzer */}
-        <MessageAnalyzer userMode={userMode} />
+        {/* Tab content */}
+        {activeTab === "analyzer" && (
+          <>
+            <ThreatIndicator
+              level="safe"
+              message={userMode === "elderly"
+                ? "Сейчас всё спокойно. Угроз нет."
+                : "Всё хорошо! Ты в безопасности 😊"}
+            />
+            <MessageAnalyzer userMode={userMode} />
+          </>
+        )}
+
+        {activeTab === "training" && (
+          <ScenarioSimulator userMode={userMode} />
+        )}
+
+        {activeTab === "stop" && (
+          <StopProtocol userMode={userMode} />
+        )}
       </main>
 
       {/* Footer */}
