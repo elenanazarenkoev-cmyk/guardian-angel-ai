@@ -6,7 +6,7 @@ import MessageAnalyzer from "@/components/MessageAnalyzer";
 import ScenarioSimulator from "@/components/ScenarioSimulator";
 import StopProtocol from "@/components/StopProtocol";
 import ThreatIndicator from "@/components/ThreatIndicator";
-import NavLink from "@/components/NavLink";
+import TabButton from "@/components/TabButton";
 import { toast } from "sonner";
 
 type TabKey = "analyzer" | "training" | "stop";
