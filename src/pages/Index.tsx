@@ -41,9 +41,9 @@ const Index = () => {
       {/* Navigation tabs */}
       <nav className="px-4 mb-4" aria-label="Основная навигация">
         <div className="flex gap-2 max-w-lg mx-auto w-full">
-          <NavLink label="Анализ" icon="📬" isActive={activeTab === "analyzer"} onClick={() => setActiveTab("analyzer")} />
-          <NavLink label="Тренажёр" icon="🎓" isActive={activeTab === "training"} onClick={() => setActiveTab("training")} />
-          <NavLink label="S.T.O.P." icon="🛡️" isActive={activeTab === "stop"} onClick={() => setActiveTab("stop")} />
+          <TabButton label="Анализ" icon="📬" isActive={activeTab === "analyzer"} onClick={() => setActiveTab("analyzer")} />
+          <TabButton label="Тренажёр" icon="🎓" isActive={activeTab === "training"} onClick={() => setActiveTab("training")} />
+          <TabButton label="S.T.O.P." icon="🛡️" isActive={activeTab === "stop"} onClick={() => setActiveTab("stop")} />
         </div>
       </nav>
 
