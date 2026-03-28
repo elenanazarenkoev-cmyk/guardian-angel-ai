@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AlertTriangle, Phone, Shield, Heart, ChevronRight, RotateCcw, Eye } from "lucide-react";
 import ThreatIndicator from "./ThreatIndicator";
+import { useCurrentUser, useSaveTrainingProgress } from "@/hooks/useDatabase";
 
 type SimStep = "trigger" | "breathing" | "analysis" | "simulation" | "lesson";
 
@@ -86,6 +87,10 @@ const ScenarioSimulator = ({ userMode }: ScenarioSimulatorProps) => {
   const [breathCount, setBreathCount] = useState(0);
   const [userFell, setUserFell] = useState(false);
   const [revealedFlags, setRevealedFlags] = useState<number[]>([]);
+  const startTimeRef = useRef<number>(Date.now());
+
+  const { data: user } = useCurrentUser();
+  const saveProgress = useSaveTrainingProgress();
 
   const resetSimulation = useCallback(() => {
     setSelectedScenario(null);
@@ -263,13 +268,37 @@ const ScenarioSimulator = ({ userMode }: ScenarioSimulatorProps) => {
 
           <div className="grid grid-cols-1 gap-3">
             <button
-              onClick={() => { setUserFell(true); setStep("lesson"); }}
+              onClick={() => {
+                setUserFell(true);
+                setStep("lesson");
+                if (user && selectedScenario) {
+                  saveProgress.mutate({
+                    user_id: user.id,
+                    scenario_id: selectedScenario.id,
+                    user_fell_for_trap: true,
+                    user_mode: userMode,
+                    time_spent_seconds: Math.round((Date.now() - startTimeRef.current) / 1000),
+                  });
+                }
+              }}
               className="touch-zone w-full rounded-2xl p-5 bg-danger text-danger-foreground text-xl font-bold transition-all hover:opacity-90"
             >
               {selectedScenario.simulationTrap}
             </button>
             <button
-              onClick={() => { setUserFell(false); setStep("lesson"); }}
+              onClick={() => {
+                setUserFell(false);
+                setStep("lesson");
+                if (user && selectedScenario) {
+                  saveProgress.mutate({
+                    user_id: user.id,
+                    scenario_id: selectedScenario.id,
+                    user_fell_for_trap: false,
+                    user_mode: userMode,
+                    time_spent_seconds: Math.round((Date.now() - startTimeRef.current) / 1000),
+                  });
+                }
+              }}
               className="touch-zone w-full rounded-2xl p-5 bg-safe text-safe-foreground text-xl font-bold transition-all hover:opacity-90"
             >
               🚫 Отказаться и положить трубку

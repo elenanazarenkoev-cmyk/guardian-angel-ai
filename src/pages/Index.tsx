@@ -5,11 +5,13 @@ import UserModeToggle from "@/components/UserModeToggle";
 import MessageAnalyzer from "@/components/MessageAnalyzer";
 import ScenarioSimulator from "@/components/ScenarioSimulator";
 import StopProtocol from "@/components/StopProtocol";
+import StatsDashboard from "@/components/StatsDashboard";
+import ThreatsBrowser from "@/components/ThreatsBrowser";
 import ThreatIndicator from "@/components/ThreatIndicator";
 import TabButton from "@/components/TabButton";
 import { toast } from "sonner";
 
-type TabKey = "analyzer" | "training" | "stop";
+type TabKey = "analyzer" | "training" | "stop" | "threats" | "stats";
 
 const Index = () => {
   const [userMode, setUserMode] = useState<"elderly" | "child">("elderly");
@@ -38,12 +40,16 @@ const Index = () => {
         Ваш цифровой защитник от мошенников
       </p>
 
-      {/* Navigation tabs */}
-      <nav className="px-4 mb-4" aria-label="Основная навигация">
+      {/* Navigation tabs - two rows for accessibility */}
+      <nav className="px-4 mb-4 space-y-2" aria-label="Основная навигация">
         <div className="flex gap-2 max-w-lg mx-auto w-full">
           <TabButton label="Анализ" icon="📬" isActive={activeTab === "analyzer"} onClick={() => setActiveTab("analyzer")} />
           <TabButton label="Тренажёр" icon="🎓" isActive={activeTab === "training"} onClick={() => setActiveTab("training")} />
           <TabButton label="S.T.O.P." icon="🛡️" isActive={activeTab === "stop"} onClick={() => setActiveTab("stop")} />
+        </div>
+        <div className="flex gap-2 max-w-lg mx-auto w-full">
+          <TabButton label="База угроз" icon="🔍" isActive={activeTab === "threats"} onClick={() => setActiveTab("threats")} />
+          <TabButton label="Прогресс" icon="📊" isActive={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         </div>
       </nav>
 
@@ -80,13 +86,10 @@ const Index = () => {
           </>
         )}
 
-        {activeTab === "training" && (
-          <ScenarioSimulator userMode={userMode} />
-        )}
-
-        {activeTab === "stop" && (
-          <StopProtocol userMode={userMode} />
-        )}
+        {activeTab === "training" && <ScenarioSimulator userMode={userMode} />}
+        {activeTab === "stop" && <StopProtocol userMode={userMode} />}
+        {activeTab === "threats" && <ThreatsBrowser userMode={userMode} />}
+        {activeTab === "stats" && <StatsDashboard userMode={userMode} />}
       </main>
 
       {/* Footer */}
