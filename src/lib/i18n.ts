@@ -191,4 +191,13 @@ export const T = {
   },
 } as const;
 
-export type Translations = typeof T["en"] | typeof T["ru"];
+// Use a widened type so both locales are assignable
+export type Translations = {
+  [K in keyof typeof T["en"]]: (typeof T["en"])[K] extends string
+    ? string
+    : (typeof T["en"])[K] extends (...args: infer A) => infer R
+    ? (...args: A) => R
+    : (typeof T["en"])[K] extends Record<string, string>
+    ? Record<string, string>
+    : (typeof T["en"])[K];
+};
