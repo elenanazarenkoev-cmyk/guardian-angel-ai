@@ -191,4 +191,4 @@ export const T = {
   },
 } as const;
 
-export type Translations = typeof T["en"];
+export type Translations = typeof T["en"] | typeof T["ru"];
