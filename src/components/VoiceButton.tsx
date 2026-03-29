@@ -1,21 +1,25 @@
 import { useState, useCallback } from "react";
 import { Mic, MicOff } from "lucide-react";
+import type { Locale } from "@/lib/i18n";
 
 interface VoiceButtonProps {
   onResult: (text: string) => void;
   promptText?: string;
+  locale?: Locale;
 }
 
-const VoiceButton = ({ onResult, promptText = "Нажмите и говорите" }: VoiceButtonProps) => {
+const VoiceButton = ({ onResult, promptText, locale = "ru" }: VoiceButtonProps) => {
   const [isListening, setIsListening] = useState(false);
   const [supported] = useState(() => "webkitSpeechRecognition" in window || "SpeechRecognition" in window);
+
+  const defaultPrompt = locale === "ru" ? "🎤 Нажмите и спросите голосом" : "🎤 Tap to speak";
 
   const startListening = useCallback(() => {
     if (!supported) return;
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = "ru-RU";
+    recognition.lang = locale === "ru" ? "ru-RU" : "en-GB";
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -28,9 +32,11 @@ const VoiceButton = ({ onResult, promptText = "Нажмите и говорит�
     };
 
     recognition.start();
-  }, [onResult, supported]);
+  }, [onResult, supported, locale]);
 
   if (!supported) return null;
+
+  const listeningLabel = locale === "ru" ? "Слушаю…" : "Listening…";
 
   return (
     <button
@@ -41,18 +47,18 @@ const VoiceButton = ({ onResult, promptText = "Нажмите и говорит�
           ? "bg-primary text-primary-foreground animate-listening glow-safe"
           : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
         }`}
-      aria-label={isListening ? "Слушаю вашу команду" : promptText}
+      aria-label={isListening ? listeningLabel : (promptText || defaultPrompt)}
       role="button"
     >
       {isListening ? (
         <>
           <Mic className="w-8 h-8" aria-hidden="true" />
-          <span>Слушаю...</span>
+          <span>{listeningLabel}</span>
         </>
       ) : (
         <>
           <MicOff className="w-8 h-8" aria-hidden="true" />
-          <span>{promptText}</span>
+          <span>{promptText || defaultPrompt}</span>
         </>
       )}
     </button>

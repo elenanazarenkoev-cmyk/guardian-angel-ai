@@ -1,12 +1,15 @@
 import { useCurrentUser } from "@/hooks/useDatabase";
 import { useUserStats } from "@/hooks/useUserStats";
 import { Trophy, Target, ShieldAlert, CheckCircle } from "lucide-react";
+import type { Locale, Translations } from "@/lib/i18n";
 
 interface StatsDashboardProps {
   userMode: "elderly" | "child";
+  locale: Locale;
+  t: Translations;
 }
 
-const StatsDashboard = ({ userMode }: StatsDashboardProps) => {
+const StatsDashboard = ({ userMode, locale, t }: StatsDashboardProps) => {
   const { data: user } = useCurrentUser();
   const { data: stats, isLoading } = useUserStats(user?.id);
 
@@ -14,9 +17,7 @@ const StatsDashboard = ({ userMode }: StatsDashboardProps) => {
     return (
       <div className="bg-card rounded-2xl p-6 text-center">
         <p className="text-lg text-muted-foreground">
-          {userMode === "elderly"
-            ? "Войдите в аккаунт, чтобы сохранять прогресс обучения"
-            : "Войди в аккаунт, чтобы сохранять свои результаты! 🎮"}
+          {userMode === "elderly" ? t.loginPromptElderly : t.loginPromptChild}
         </p>
       </div>
     );
@@ -25,7 +26,7 @@ const StatsDashboard = ({ userMode }: StatsDashboardProps) => {
   if (isLoading || !stats) {
     return (
       <div className="bg-card rounded-2xl p-6 text-center">
-        <p className="text-lg text-muted-foreground">Загрузка статистики...</p>
+        <p className="text-lg text-muted-foreground">{t.loadingStats}</p>
       </div>
     );
   }
@@ -33,26 +34,26 @@ const StatsDashboard = ({ userMode }: StatsDashboardProps) => {
   const statCards = [
     {
       icon: Target,
-      label: "Пройдено сценариев",
+      label: t.scenariosCompleted,
       value: `${stats.completedScenarios} / ${stats.totalScenarios}`,
       color: "text-primary",
     },
     {
       icon: Trophy,
-      label: "Успешность",
+      label: t.successRate,
       value: `${stats.successRate}%`,
       color: "text-safe",
     },
     {
       icon: ShieldAlert,
-      label: "Попались на уловку",
+      label: t.fellForTraps,
       value: `${stats.fellForTraps}`,
       color: "text-danger",
     },
     {
       icon: CheckCircle,
-      label: "Протокол S.T.O.P.",
-      value: stats.stopCompleted ? "Пройден ✅" : "Не пройден",
+      label: t.stopProtocolLabel,
+      value: stats.stopCompleted ? t.completed : t.notCompleted,
       color: stats.stopCompleted ? "text-safe" : "text-muted-foreground",
     },
   ];
@@ -60,13 +61,13 @@ const StatsDashboard = ({ userMode }: StatsDashboardProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-2xl font-bold text-center text-foreground">
-        📊 Ваш прогресс
+        {t.statsTitle}
       </h3>
       <div className="grid grid-cols-2 gap-3">
         {statCards.map((card, idx) => {
           const Icon = card.icon;
           return (
-            <div key={idx} className="bg-card rounded-2xl p-4 text-center">
+            <div key={idx} className="bg-card rounded-2xl p-4 text-center border border-border">
               <Icon className={`w-8 h-8 mx-auto mb-2 ${card.color}`} aria-hidden="true" />
               <p className="text-2xl font-black text-foreground">{card.value}</p>
               <p className="text-sm text-muted-foreground mt-1">{card.label}</p>
