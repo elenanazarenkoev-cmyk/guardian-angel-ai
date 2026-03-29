@@ -1,164 +1,193 @@
 import { useState } from "react";
-import { Search, Mail, MessageSquare, Phone } from "lucide-react";
+import { Search, MessageSquare, Mail, Phone, Globe, Volume2, RotateCcw } from "lucide-react";
 import ThreatIndicator from "./ThreatIndicator";
 import SafeTouchButton from "./SafeTouchButton";
+import { analyzeMessage, type SourceType, type AnalysisResult } from "@/lib/threatAnalyzer";
+import type { Locale, Translations } from "@/lib/i18n";
 
-type ThreatLevel = "safe" | "warning" | "danger";
-
-interface AnalysisResult {
-  level: ThreatLevel;
-  message: string;
-  details: string;
-  elderlyExplanation: string;
-  childExplanation: string;
-}
-
-const sampleMessages = [
-  {
-    type: "sms" as const,
-    icon: MessageSquare,
-    sender: "+7-900-XXX-XX-XX",
-    text: "Ваша карта заблокирована! Срочно перейдите по ссылке bank-security-check.xyz для разблокировки",
-  },
-  {
-    type: "email" as const,
-    icon: Mail,
-    sender: "support@biink-safety.com",
-    text: "Уважаемый клиент! Вы выиграли 500 000 рублей. Для получения приза отправьте код подтверждения.",
-  },
-  {
-    type: "call" as const,
-    icon: Phone,
-    sender: "+7-495-XXX-XX-XX",
-    text: "Звонок: 'Здравствуйте, это служба безопасности вашего банка. На ваш счёт зафиксирован несанкционированный перевод...'",
-  },
-  {
-    type: "sms" as const,
-    icon: MessageSquare,
-    sender: "Мама",
-    text: "Привет! Забери молоко из магазина по дороге домой 🥛",
-  },
+const SOURCE_OPTIONS: { key: SourceType; icon: React.ElementType }[] = [
+  { key: "sms", icon: MessageSquare },
+  { key: "email", icon: Mail },
+  { key: "call", icon: Phone },
+  { key: "web", icon: Globe },
 ];
-
-function analyzeMessage(text: string): AnalysisResult {
-  const lowerText = text.toLowerCase();
-  const urgencyWords = ["срочно", "немедленно", "заблокирован", "последний шанс"];
-  const greedWords = ["выиграли", "приз", "бесплатно", "подарок"];
-  const codeWords = ["код", "пароль", "пин", "cvv", "подтверждение"];
-  const linkPattern = /\b[\w-]+\.(xyz|tk|ml|ga|cf|click|buzz)\b/i;
-
-  const urgency = urgencyWords.some(w => lowerText.includes(w));
-  const greed = greedWords.some(w => lowerText.includes(w));
-  const codeRequest = codeWords.some(w => lowerText.includes(w));
-  const suspiciousLink = linkPattern.test(text);
-
-  const score = (urgency ? 3 : 0) + (greed ? 2 : 0) + (codeRequest ? 3 : 0) + (suspiciousLink ? 4 : 0);
-
-  if (score >= 5) {
-    return {
-      level: "danger",
-      message: "Это мошенничество!",
-      details: `Обнаружено: ${[
-        urgency && "давление срочностью",
-        greed && "приманка выигрышем",
-        codeRequest && "запрос секретного кода",
-        suspiciousLink && "поддельная ссылка",
-      ].filter(Boolean).join(", ")}`,
-      elderlyExplanation: "Это обманщики. Они хотят украсть ваши деньги. Не отвечайте и не нажимайте ни на что. Я уже предупредил вашего близкого.",
-      childExplanation: "Это плохие люди! Они врут и хотят обмануть. Не трогай это сообщение. Покажи маме или папе!",
-    };
-  } else if (score >= 2) {
-    return {
-      level: "warning",
-      message: "Есть подозрения",
-      details: `Замечено: ${[
-        urgency && "торопят с решением",
-        greed && "обещают что-то бесплатно",
-        codeRequest && "просят личные данные",
-      ].filter(Boolean).join(", ")}`,
-      elderlyExplanation: "Это сообщение вызывает сомнения. Лучше не отвечайте. Давайте вместе проверим — спросите у близкого человека.",
-      childExplanation: "Хмм, это сообщение какое-то странное. Лучше спроси у взрослого, прежде чем что-то делать.",
-    };
-  }
-  return {
-    level: "safe",
-    message: "Всё в порядке",
-    details: "Подозрительных признаков не обнаружено.",
-    elderlyExplanation: "Это обычное безопасное сообщение. Можете спокойно его прочитать.",
-    childExplanation: "Всё хорошо! Это обычное сообщение. 😊",
-  };
-}
 
 interface MessageAnalyzerProps {
   userMode: "elderly" | "child";
+  locale: Locale;
+  t: Translations;
 }
 
-const MessageAnalyzer = ({ userMode }: MessageAnalyzerProps) => {
-  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
+  const [source, setSource] = useState<SourceType>("sms");
+  const [content, setContent] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleAnalyze = (idx: number) => {
-    setSelectedIdx(idx);
-    setResult(analyzeMessage(sampleMessages[idx].text));
+  const handleAnalyze = async () => {
+    if (!content.trim()) return;
+    setIsAnalyzing(true);
+    // Simulate brief processing delay for UX
+    await new Promise(r => setTimeout(r, 600));
+    const res = analyzeMessage(content);
+    setResult(res);
+    setIsAnalyzing(false);
   };
+
+  const handleReset = () => {
+    setResult(null);
+    setContent("");
+  };
+
+  const speak = (text: string) => {
+    if ("speechSynthesis" in window) {
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = locale === "ru" ? "ru-RU" : "en-GB";
+      utt.rate = 0.85;
+      speechSynthesis.speak(utt);
+    }
+  };
+
+  const verdictLevel = result?.verdict === "safe" ? "safe" : result?.verdict === "warning" ? "warning" : "danger";
+  const verdictLabel = result
+    ? { safe: t.resultSafe, warning: t.resultWarning, danger: t.resultDanger }[result.verdict]
+    : "";
+  const explanation = result
+    ? userMode === "elderly"
+      ? locale === "ru" ? result.elderlyExplanation_ru : result.elderlyExplanation_en
+      : locale === "ru" ? result.childExplanation_ru : result.childExplanation_en
+    : "";
 
   return (
     <div className="space-y-4">
       <h3 className="text-2xl font-bold text-center text-foreground">
-        📬 Входящие сообщения
+        {t.inboxTitle}
       </h3>
 
-      <div className="space-y-3">
-        {sampleMessages.map((msg, idx) => {
-          const Icon = msg.icon;
-          const isSelected = selectedIdx === idx;
+      {/* Source type selector */}
+      <div className="flex gap-2" role="radiogroup" aria-label="Message type">
+        {SOURCE_OPTIONS.map(opt => {
+          const Icon = opt.icon;
+          const isActive = source === opt.key;
           return (
             <button
-              key={idx}
-              onClick={() => handleAnalyze(idx)}
-              className={`touch-zone w-full rounded-2xl p-5 text-left flex items-start gap-4
-                transition-all duration-200 select-none
-                ${isSelected ? "ring-4 ring-primary bg-muted" : "bg-card hover:bg-muted"}`}
-              aria-label={`Проверить сообщение от ${msg.sender}`}
+              key={opt.key}
+              onClick={() => { setSource(opt.key); handleReset(); }}
+              className={`touch-zone flex-1 flex flex-col items-center justify-center gap-1 py-3 rounded-xl border-2 transition-all duration-200 ${
+                isActive
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted"
+              }`}
+              role="radio"
+              aria-checked={isActive}
+              aria-label={t.sourceLabels[opt.key]}
             >
-              <Icon className="w-8 h-8 mt-1 text-muted-foreground shrink-0" aria-hidden="true" />
-              <div className="min-w-0">
-                <p className="text-lg font-bold text-foreground">{msg.sender}</p>
-                <p className="text-base text-muted-foreground line-clamp-2">{msg.text}</p>
-              </div>
-              <Search className="w-6 h-6 text-muted-foreground shrink-0 mt-2" aria-hidden="true" />
+              <Icon className="w-5 h-5" aria-hidden="true" />
+              <span className="text-xs font-bold">{t.sourceLabels[opt.key]}</span>
             </button>
           );
         })}
       </div>
 
-      {result && (
-        <div className="space-y-4 mt-6">
-          <ThreatIndicator level={result.level} message={result.message} details={result.details} />
+      {/* Text input */}
+      <textarea
+        className="w-full min-h-[120px] rounded-2xl p-4 bg-card text-foreground border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none resize-none text-base leading-relaxed placeholder:text-muted-foreground transition-colors"
+        placeholder={t.pastePlaceholder[source]}
+        value={content}
+        onChange={e => setContent(e.target.value)}
+        aria-label={locale === "ru" ? "Введите текст для проверки" : "Enter text to check"}
+        rows={userMode === "elderly" ? 5 : 4}
+      />
 
+      {/* Analyze button */}
+      <button
+        onClick={handleAnalyze}
+        disabled={isAnalyzing || !content.trim()}
+        className="touch-zone w-full rounded-2xl p-5 bg-primary text-primary-foreground text-xl font-bold transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-3"
+        aria-label={locale === "ru" ? "Проверить сообщение" : "Check message"}
+      >
+        {isAnalyzing ? (
+          <>
+            <Search className="w-6 h-6 animate-spin" />
+            <span>{t.analyzing}</span>
+          </>
+        ) : (
+          <>
+            <Search className="w-6 h-6" />
+            <span>{t.analyzeBtn}</span>
+          </>
+        )}
+      </button>
+
+      {/* Result */}
+      {result && (
+        <div className="space-y-4 mt-2 animate-in fade-in duration-300">
+          <ThreatIndicator
+            level={verdictLevel as "safe" | "warning" | "danger"}
+            message={verdictLabel}
+            details={`${t.riskLabel} ${Math.round(result.score * 100)}%`}
+          />
+
+          {/* Explanation */}
           <div className="bg-card rounded-2xl p-6">
-            <p className="text-lg font-semibold text-foreground mb-2">
-              {userMode === "elderly" ? "👴 Объяснение:" : "👧 Объяснение:"}
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-lg font-semibold text-foreground">
+                {userMode === "elderly" ? t.elderlyExplanation : t.childExplanation}
+              </p>
+              <button
+                onClick={() => speak(explanation)}
+                className="p-2 rounded-xl hover:bg-muted transition-colors"
+                aria-label={locale === "ru" ? "Прочитать вслух" : "Read aloud"}
+              >
+                <Volume2 className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
             <p className="text-xl leading-relaxed text-foreground">
-              {userMode === "elderly" ? result.elderlyExplanation : result.childExplanation}
+              {explanation}
             </p>
           </div>
 
-          {result.level === "danger" && (
-            <div className="grid grid-cols-1 gap-3">
-              <SafeTouchButton
-                label="🚫 ЗАБЛОКИРОВАТЬ"
-                variant="danger"
-                onConfirm={() => {}}
-              />
-              <SafeTouchButton
-                label="📞 ПОЗВОНИТЬ БЛИЗКОМУ"
-                variant="primary"
-                onConfirm={() => {}}
-              />
+          {/* Threat flags */}
+          {result.flags.length > 0 && (
+            <div className="bg-card rounded-2xl p-5">
+              <p className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wide">
+                {t.detectedSignals}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {result.flags.map(flag => (
+                  <span
+                    key={flag.key}
+                    className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${
+                      flag.severity === "high"
+                        ? "bg-danger/10 text-danger border-danger/30"
+                        : flag.severity === "medium"
+                        ? "bg-warning/10 text-warning border-warning/30"
+                        : "bg-muted text-muted-foreground border-border"
+                    }`}
+                  >
+                    {locale === "ru" ? flag.label_ru : flag.label_en}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
+
+          {/* Action buttons for danger */}
+          {result.verdict === "danger" && (
+            <div className="grid grid-cols-1 gap-3">
+              <SafeTouchButton label={t.blockBtn} variant="danger" onConfirm={() => {}} />
+              <SafeTouchButton label={t.callRelativeBtn} variant="primary" onConfirm={() => {}} />
+            </div>
+          )}
+
+          {/* Reset */}
+          <button
+            onClick={handleReset}
+            className="touch-zone w-full rounded-2xl p-4 bg-secondary text-secondary-foreground text-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-secondary/80"
+          >
+            <RotateCcw className="w-5 h-5" />
+            {t.checkAnother}
+          </button>
         </div>
       )}
     </div>
