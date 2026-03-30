@@ -6,27 +6,28 @@ interface ThreatIndicatorProps {
   level: ThreatLevel;
   message: string;
   details?: string;
+  locale?: "ru" | "en";
 }
 
 const config = {
   safe: {
     icon: ShieldCheck,
     className: "status-safe glow-safe",
-    statusText: "БЕЗОПАСНО",
+    statusText: { ru: "БЕЗОПАСНО", en: "SAFE" },
   },
   warning: {
     icon: ShieldAlert,
     className: "status-warning glow-warning",
-    statusText: "ВНИМАНИЕ",
+    statusText: { ru: "ВНИМАНИЕ", en: "WARNING" },
   },
   danger: {
     icon: ShieldX,
     className: "status-danger glow-danger animate-pulse-glow",
-    statusText: "ОПАСНОСТЬ",
+    statusText: { ru: "ОПАСНОСТЬ", en: "DANGER" },
   },
 };
 
-const ThreatIndicator = ({ level, message, details }: ThreatIndicatorProps) => {
+const ThreatIndicator = ({ level, message, details, locale = "ru" }: ThreatIndicatorProps) => {
   const { icon: Icon, className, statusText } = config[level];
 
   return (
@@ -37,7 +38,7 @@ const ThreatIndicator = ({ level, message, details }: ThreatIndicatorProps) => {
       aria-atomic="true"
     >
       <Icon className="w-20 h-20" aria-hidden="true" />
-      <h2 className="text-4xl font-black tracking-wider">{statusText}</h2>
+      <h2 className="text-4xl font-black tracking-wider">{statusText[locale]}</h2>
       <p className="text-xl font-semibold leading-relaxed max-w-md">{message}</p>
       {details && (
         <p className="text-lg opacity-80 leading-relaxed max-w-md">{details}</p>

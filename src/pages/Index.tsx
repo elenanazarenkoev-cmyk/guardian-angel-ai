@@ -114,6 +114,7 @@ const Index = () => {
             <ThreatIndicator
               level="safe"
               message={userMode === "elderly" ? t.safeStatus : t.safeStatusChild}
+              locale={locale}
             />
             <MessageAnalyzer userMode={userMode} locale={locale} t={t} />
           </>

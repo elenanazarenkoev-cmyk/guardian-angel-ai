@@ -295,6 +295,7 @@ const ScenarioSimulator = ({ userMode, locale, t }: ScenarioSimulatorProps) => {
             level="danger"
             message={t.redFlagsFound}
             details={t.redFlagsCount(selectedScenario.redFlags.length)}
+            locale={locale}
           />
           <div className="space-y-3">
             {selectedScenario.redFlags.map((flag, idx) => (
@@ -379,6 +380,7 @@ const ScenarioSimulator = ({ userMode, locale, t }: ScenarioSimulatorProps) => {
             level={selectedOption?.is_correct ? "safe" : "danger"}
             message={selectedOption?.is_correct ? t.passedTest : t.fellForTrap}
             details={selectedOption?.is_correct ? t.passedTestDetail : t.fellForTrapDetail}
+            locale={locale}
           />
 
           <div className="bg-card rounded-2xl p-6">

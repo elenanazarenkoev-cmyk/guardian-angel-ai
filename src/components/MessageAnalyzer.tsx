@@ -126,6 +126,7 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
             level={verdictLevel as "safe" | "warning" | "danger"}
             message={verdictLabel}
             details={`${t.riskLabel} ${Math.round(result.score * 100)}%`}
+            locale={locale}
           />
 
           {/* Explanation */}
