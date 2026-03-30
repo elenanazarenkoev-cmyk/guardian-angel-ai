@@ -43,15 +43,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="px-6 pt-8 pb-4 flex items-center justify-center gap-3">
-        <ShieldCheck className="w-10 h-10 text-safe" aria-hidden="true" />
-        <h1 className="text-3xl font-black text-foreground tracking-tight">
+      <header className="px-4 sm:px-6 pt-6 sm:pt-8 pb-3 sm:pb-4 flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+        <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-safe" aria-hidden="true" />
+        <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
           {t.appName}
         </h1>
-        {/* Language toggle */}
         <button
           onClick={toggleLocale}
-          className="ml-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-bold hover:bg-secondary/80 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-bold hover:bg-secondary/80 transition-colors"
           aria-label={locale === "ru" ? "Switch to English" : "Переключить на русский"}
         >
           <Globe className="w-4 h-4" />
@@ -59,25 +58,14 @@ const Index = () => {
         </button>
       </header>
 
-      <p className="text-center text-lg text-muted-foreground px-6 mb-4">
+      <p className="text-center text-base sm:text-lg text-muted-foreground px-4 sm:px-6 mb-3 sm:mb-4">
         {t.tagline}
       </p>
 
-      {/* Navigation tabs */}
-      <nav className="px-4 mb-4 space-y-2" aria-label={locale === "ru" ? "Основная навигация" : "Main navigation"}>
-        <div className="flex gap-2 max-w-lg mx-auto w-full">
-          {(["analyzer", "training", "stop"] as TabKey[]).map(tab => (
-            <TabButton
-              key={tab}
-              label={t.tabs[tab]}
-              icon={TAB_ICONS[tab]}
-              isActive={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
-            />
-          ))}
-        </div>
-        <div className="flex gap-2 max-w-lg mx-auto w-full">
-          {(["threats", "stats"] as TabKey[]).map(tab => (
+      {/* Navigation tabs — scrollable on mobile, wrapped on desktop */}
+      <nav className="px-3 sm:px-4 mb-3 sm:mb-4" aria-label={locale === "ru" ? "Основная навигация" : "Main navigation"}>
+        <div className="flex gap-1.5 sm:gap-2 max-w-2xl mx-auto w-full overflow-x-auto pb-1 scrollbar-hide">
+          {(["analyzer", "training", "stop", "threats", "stats"] as TabKey[]).map(tab => (
             <TabButton
               key={tab}
               label={t.tabs[tab]}
@@ -90,7 +78,7 @@ const Index = () => {
       </nav>
 
       {/* Main content */}
-      <main className="flex-1 px-4 pb-8 space-y-6 max-w-lg mx-auto w-full">
+      <main className="flex-1 px-3 sm:px-4 pb-6 sm:pb-8 space-y-4 sm:space-y-6 max-w-2xl mx-auto w-full">
         {/* User mode selector */}
         <UserModeToggle mode={userMode} onChange={setUserMode} locale={locale} />
 
@@ -102,9 +90,9 @@ const Index = () => {
         />
 
         {voiceQuery && (
-          <div className="bg-card rounded-2xl p-5">
-            <p className="text-muted-foreground text-base">{locale === "ru" ? "Ваш вопрос:" : "Your question:"}</p>
-            <p className="text-foreground text-xl font-semibold mt-1">«{voiceQuery}»</p>
+          <div className="bg-card rounded-2xl p-4 sm:p-5">
+            <p className="text-muted-foreground text-sm sm:text-base">{locale === "ru" ? "Ваш вопрос:" : "Your question:"}</p>
+            <p className="text-foreground text-lg sm:text-xl font-semibold mt-1">«{voiceQuery}»</p>
           </div>
         )}
 
@@ -127,8 +115,8 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="px-6 py-4 text-center">
-        <p className="text-sm text-muted-foreground">
+      <footer className="px-4 sm:px-6 py-3 sm:py-4 text-center">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           {t.footer}
         </p>
       </footer>
