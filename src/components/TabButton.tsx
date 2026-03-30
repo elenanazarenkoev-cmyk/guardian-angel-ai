@@ -9,16 +9,16 @@ const TabButton = ({ label, icon, isActive, onClick }: TabButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className={`touch-zone flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl transition-all duration-200 text-center ${
+      className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2.5 px-3 sm:px-4 rounded-xl transition-all duration-200 text-center min-h-[44px] ${
         isActive
-          ? "bg-primary text-primary-foreground"
-          : "bg-card text-muted-foreground hover:bg-muted"
+          ? "bg-primary text-primary-foreground shadow-md"
+          : "bg-card text-muted-foreground hover:bg-muted border border-border"
       }`}
       aria-current={isActive ? "page" : undefined}
       aria-label={label}
     >
-      <span className="text-2xl" aria-hidden="true">{icon}</span>
-      <span className="text-xs font-bold leading-tight">{label}</span>
+      <span className="text-base sm:text-lg" aria-hidden="true">{icon}</span>
+      <span className="text-xs sm:text-sm font-bold leading-tight whitespace-nowrap">{label}</span>
     </button>
   );
 };
