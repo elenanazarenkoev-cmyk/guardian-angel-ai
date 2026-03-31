@@ -107,7 +107,7 @@ const IMMEDIATE_ACTIONS = {
 };
 
 interface StopProtocolProps {
-  userMode: "elderly" | "child";
+  userMode: "elderly" | "child" | "adult";
   locale: Locale;
   t: Translations;
 }
