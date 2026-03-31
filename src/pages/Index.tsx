@@ -1,71 +1,93 @@
 import { useState, useCallback } from "react";
 import { ShieldCheck, Globe } from "lucide-react";
-import VoiceButton from "@/components/VoiceButton";
+import Onboarding from "@/components/Onboarding";
+import HomeScreen from "@/components/HomeScreen";
 import UserModeToggle from "@/components/UserModeToggle";
 import MessageAnalyzer from "@/components/MessageAnalyzer";
 import ScenarioSimulator from "@/components/ScenarioSimulator";
 import StopProtocol from "@/components/StopProtocol";
-import StatsDashboard from "@/components/StatsDashboard";
 import ThreatsBrowser from "@/components/ThreatsBrowser";
-import ThreatIndicator from "@/components/ThreatIndicator";
+import StatsDashboard from "@/components/StatsDashboard";
 import TabButton from "@/components/TabButton";
 import { toast } from "sonner";
-import { T, type Locale } from "@/lib/i18n";
+import { T, type Locale, type UserMode } from "@/lib/i18n";
 
-type TabKey = "analyzer" | "training" | "stop" | "threats" | "stats";
+type TabKey = "home" | "analyzer" | "training" | "stop" | "threats" | "stats";
 
 const TAB_ICONS: Record<TabKey, string> = {
-  analyzer: "📬",
+  home: "🏠",
+  analyzer: "🔍",
   training: "🎓",
-  stop: "🛡️",
-  threats: "🔍",
+  stop: "🛑",
+  threats: "📚",
   stats: "📊",
 };
 
 const Index = () => {
-  const [userMode, setUserMode] = useState<"elderly" | "child">("elderly");
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [userMode, setUserMode] = useState<UserMode>("adult");
   const [locale, setLocale] = useState<Locale>("ru");
-  const [voiceQuery, setVoiceQuery] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabKey>("analyzer");
+  const [activeTab, setActiveTab] = useState<TabKey>("home");
 
   const t = T[locale];
+  const toggleLocale = () => setLocale(l => l === "ru" ? "en" : "ru");
+
+  const handleModeSelect = (mode: UserMode) => {
+    setUserMode(mode);
+    setShowOnboarding(false);
+  };
 
   const handleVoiceResult = useCallback((text: string) => {
-    setVoiceQuery(text);
     toast.success(locale === "ru" ? `Вы сказали: "${text}"` : `You said: "${text}"`, {
       description: locale === "ru" ? "Анализирую ваш запрос..." : "Analyzing your request...",
       duration: 4000,
     });
+    setActiveTab("analyzer");
   }, [locale]);
 
-  const toggleLocale = () => setLocale(l => l === "ru" ? "en" : "ru");
+  if (showOnboarding) {
+    return <Onboarding locale={locale} onSelect={handleModeSelect} onToggleLang={toggleLocale} />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="px-4 sm:px-6 pt-6 sm:pt-8 pb-3 sm:pb-4 flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-        <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-safe" aria-hidden="true" />
-        <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-          {t.appName}
-        </h1>
-        <button
-          onClick={toggleLocale}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-bold hover:bg-secondary/80 transition-colors"
-          aria-label={locale === "ru" ? "Switch to English" : "Переключить на русский"}
-        >
-          <Globe className="w-4 h-4" />
-          {locale === "ru" ? "EN" : "RU"}
-        </button>
+      <header className="px-4 pt-4 pb-3 bg-gradient-to-b from-[#1e3a5f] to-[#1e4a7f] text-white rounded-b-[28px]">
+        <div className="flex items-center justify-between max-w-2xl mx-auto w-full mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">🛡️</div>
+            <span className="text-lg font-extrabold tracking-tight">{t.appName}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowOnboarding(true)}
+              className="px-3 py-1.5 rounded-full bg-white/15 text-xs font-bold hover:bg-white/25 transition-colors"
+            >
+              {userMode === "adult" ? t.modeAdult : userMode === "elderly" ? t.modeElderly : t.modeChild}
+            </button>
+            <button
+              onClick={toggleLocale}
+              className="px-3 py-1.5 rounded-full bg-white/15 text-xs font-bold hover:bg-white/25 transition-colors"
+            >
+              {locale === "ru" ? "EN" : "RU"}
+            </button>
+          </div>
+        </div>
+
+        {/* Status bar */}
+        <div className="max-w-2xl mx-auto w-full bg-white/10 rounded-2xl p-3.5 flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full bg-green-400 flex-shrink-0" style={{ animation: "pulse-glow 2s infinite" }} />
+          <div>
+            <p className="text-sm font-semibold">{t.safeStatus}</p>
+            <p className="text-xs opacity-60">{t.safeStatusSub}</p>
+          </div>
+        </div>
       </header>
 
-      <p className="text-center text-base sm:text-lg text-muted-foreground px-4 sm:px-6 mb-3 sm:mb-4">
-        {t.tagline}
-      </p>
-
-      {/* Navigation tabs — scrollable on mobile, wrapped on desktop */}
-      <nav className="px-3 sm:px-4 mb-3 sm:mb-4" aria-label={locale === "ru" ? "Основная навигация" : "Main navigation"}>
-        <div className="flex gap-1.5 sm:gap-2 max-w-2xl mx-auto w-full overflow-x-auto pb-1 scrollbar-hide">
-          {(["analyzer", "training", "stop", "threats", "stats"] as TabKey[]).map(tab => (
+      {/* Navigation */}
+      <nav className="px-3 py-2.5" aria-label="Main navigation">
+        <div className="flex gap-1 max-w-2xl mx-auto w-full overflow-x-auto scrollbar-hide">
+          {(["home", "analyzer", "training", "stop", "threats", "stats"] as TabKey[]).map(tab => (
             <TabButton
               key={tab}
               label={t.tabs[tab]}
@@ -78,48 +100,22 @@ const Index = () => {
       </nav>
 
       {/* Main content */}
-      <main className="flex-1 px-3 sm:px-4 pb-6 sm:pb-8 space-y-4 sm:space-y-6 max-w-2xl mx-auto w-full">
-        {/* User mode selector */}
-        <UserModeToggle mode={userMode} onChange={setUserMode} locale={locale} />
-
-        {/* Voice control */}
-        <VoiceButton
-          onResult={handleVoiceResult}
-          promptText={t.voicePrompt}
-          locale={locale}
-        />
-
-        {voiceQuery && (
-          <div className="bg-card rounded-2xl p-4 sm:p-5">
-            <p className="text-muted-foreground text-sm sm:text-base">{locale === "ru" ? "Ваш вопрос:" : "Your question:"}</p>
-            <p className="text-foreground text-lg sm:text-xl font-semibold mt-1">«{voiceQuery}»</p>
-          </div>
+      <main className="flex-1 px-3 sm:px-4 pb-6 space-y-4 max-w-2xl mx-auto w-full">
+        {activeTab === "home" && (
+          <HomeScreen
+            userMode={userMode}
+            locale={locale}
+            t={t}
+            onNavigate={(tab) => setActiveTab(tab as TabKey)}
+            onVoiceResult={handleVoiceResult}
+          />
         )}
-
-        {/* Tab content */}
-        {activeTab === "analyzer" && (
-          <>
-            <ThreatIndicator
-              level="safe"
-              message={userMode === "elderly" ? t.safeStatus : t.safeStatusChild}
-              locale={locale}
-            />
-            <MessageAnalyzer userMode={userMode} locale={locale} t={t} />
-          </>
-        )}
-
+        {activeTab === "analyzer" && <MessageAnalyzer userMode={userMode} locale={locale} t={t} />}
         {activeTab === "training" && <ScenarioSimulator userMode={userMode} locale={locale} t={t} />}
         {activeTab === "stop" && <StopProtocol userMode={userMode} locale={locale} t={t} />}
         {activeTab === "threats" && <ThreatsBrowser userMode={userMode} locale={locale} t={t} />}
         {activeTab === "stats" && <StatsDashboard userMode={userMode} locale={locale} t={t} />}
       </main>
-
-      {/* Footer */}
-      <footer className="px-4 sm:px-6 py-3 sm:py-4 text-center">
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          {t.footer}
-        </p>
-      </footer>
     </div>
   );
 };

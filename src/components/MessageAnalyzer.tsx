@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { Search, MessageSquare, Mail, Phone, Globe, Volume2, RotateCcw } from "lucide-react";
+import { Search, Volume2, RotateCcw } from "lucide-react";
 import ThreatIndicator from "./ThreatIndicator";
 import SafeTouchButton from "./SafeTouchButton";
 import { analyzeMessage, type SourceType, type AnalysisResult } from "@/lib/threatAnalyzer";
 import type { Locale, Translations } from "@/lib/i18n";
 
-const SOURCE_OPTIONS: { key: SourceType; icon: React.ElementType }[] = [
-  { key: "sms", icon: MessageSquare },
-  { key: "email", icon: Mail },
-  { key: "call", icon: Phone },
-  { key: "web", icon: Globe },
+const SOURCE_OPTIONS: { key: SourceType; label_key: string }[] = [
+  { key: "sms", label_key: "sms" },
+  { key: "email", label_key: "email" },
+  { key: "call", label_key: "call" },
+  { key: "web", label_key: "web" },
 ];
 
 interface MessageAnalyzerProps {
-  userMode: "elderly" | "child";
+  userMode: "elderly" | "child" | "adult";
   locale: Locale;
   t: Translations;
 }
 
-const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
+const MessageAnalyzer = ({ locale, t }: MessageAnalyzerProps) => {
   const [source, setSource] = useState<SourceType>("sms");
   const [content, setContent] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -27,7 +27,6 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
   const handleAnalyze = async () => {
     if (!content.trim()) return;
     setIsAnalyzing(true);
-    // Simulate brief processing delay for UX
     await new Promise(r => setTimeout(r, 600));
     const res = analyzeMessage(content);
     setResult(res);
@@ -48,42 +47,44 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
     }
   };
 
-  const verdictLevel = result?.verdict === "safe" ? "safe" : result?.verdict === "warning" ? "warning" : "danger";
   const verdictLabel = result
     ? { safe: t.resultSafe, warning: t.resultWarning, danger: t.resultDanger }[result.verdict]
     : "";
   const explanation = result
-    ? userMode === "elderly"
-      ? locale === "ru" ? result.elderlyExplanation_ru : result.elderlyExplanation_en
-      : locale === "ru" ? result.childExplanation_ru : result.childExplanation_en
+    ? locale === "ru" ? result.explanation_ru : result.explanation_en
+    : "";
+
+  const scoreColor = result
+    ? result.verdict === "danger" ? "bg-[hsl(var(--danger))]"
+    : result.verdict === "warning" ? "bg-[hsl(var(--warning))]"
+    : "bg-[hsl(var(--safe))]"
     : "";
 
   return (
     <div className="space-y-4">
-      <h3 className="text-2xl font-bold text-center text-foreground">
-        {t.inboxTitle}
-      </h3>
+      {/* Header */}
+      <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border">
+        <h3 className="text-lg font-bold text-foreground mb-1">{t.inboxTitle}</h3>
+        <p className="text-sm text-muted-foreground">{t.inboxDesc}</p>
+      </div>
 
-      {/* Source type selector */}
-      <div className="flex gap-2" role="radiogroup" aria-label="Message type">
+      {/* Source tabs */}
+      <div className="flex gap-1" role="radiogroup" aria-label="Message type">
         {SOURCE_OPTIONS.map(opt => {
-          const Icon = opt.icon;
           const isActive = source === opt.key;
           return (
             <button
               key={opt.key}
               onClick={() => { setSource(opt.key); handleReset(); }}
-              className={`touch-zone flex-1 flex flex-col items-center justify-center gap-1 py-3 rounded-xl border-2 transition-all duration-200 ${
+              className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 isActive
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:bg-muted"
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border bg-card text-muted-foreground hover:bg-muted"
               }`}
               role="radio"
               aria-checked={isActive}
-              aria-label={t.sourceLabels[opt.key]}
             >
-              <Icon className="w-5 h-5" aria-hidden="true" />
-              <span className="text-xs font-bold">{t.sourceLabels[opt.key]}</span>
+              {t.sourceLabels[opt.label_key]}
             </button>
           );
         })}
@@ -91,29 +92,27 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
 
       {/* Text input */}
       <textarea
-        className="w-full min-h-[120px] rounded-2xl p-4 bg-card text-foreground border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none resize-none text-base leading-relaxed placeholder:text-muted-foreground transition-colors"
+        className="w-full min-h-[100px] rounded-xl p-3.5 bg-card text-foreground border border-border focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none resize-vertical text-sm leading-relaxed placeholder:text-muted-foreground transition-colors"
         placeholder={t.pastePlaceholder[source]}
         value={content}
         onChange={e => setContent(e.target.value)}
-        aria-label={locale === "ru" ? "Введите текст для проверки" : "Enter text to check"}
-        rows={userMode === "elderly" ? 5 : 4}
+        rows={5}
       />
 
       {/* Analyze button */}
       <button
         onClick={handleAnalyze}
         disabled={isAnalyzing || !content.trim()}
-        className="touch-zone w-full rounded-2xl p-5 bg-primary text-primary-foreground text-xl font-bold transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-3"
-        aria-label={locale === "ru" ? "Проверить сообщение" : "Check message"}
+        className="w-full rounded-xl p-4 bg-primary text-primary-foreground text-base font-bold transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-3 min-h-[52px]"
       >
         {isAnalyzing ? (
           <>
-            <Search className="w-6 h-6 animate-spin" />
+            <Search className="w-5 h-5 animate-spin" />
             <span>{t.analyzing}</span>
           </>
         ) : (
           <>
-            <Search className="w-6 h-6" />
+            <Search className="w-5 h-5" />
             <span>{t.analyzeBtn}</span>
           </>
         )}
@@ -121,49 +120,51 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
 
       {/* Result */}
       {result && (
-        <div className="space-y-4 mt-2 animate-in fade-in duration-300">
+        <div className="space-y-3 animate-in fade-in duration-300">
           <ThreatIndicator
-            level={verdictLevel as "safe" | "warning" | "danger"}
+            level={result.verdict}
             message={verdictLabel}
-            details={`${t.riskLabel} ${Math.round(result.score * 100)}%`}
             locale={locale}
           />
 
-          {/* Explanation */}
-          <div className="bg-card rounded-2xl p-6">
+          {/* Score bar */}
+          <div className="bg-card rounded-xl p-4 border border-border">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-lg font-semibold text-foreground">
-                {userMode === "elderly" ? t.elderlyExplanation : t.childExplanation}
-              </p>
-              <button
-                onClick={() => speak(explanation)}
-                className="p-2 rounded-xl hover:bg-muted transition-colors"
-                aria-label={locale === "ru" ? "Прочитать вслух" : "Read aloud"}
-              >
-                <Volume2 className="w-5 h-5 text-muted-foreground" />
-              </button>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t.riskLabel}</span>
+              <span className="text-sm font-bold text-foreground">{result.score}%</span>
             </div>
-            <p className="text-xl leading-relaxed text-foreground">
-              {explanation}
-            </p>
+            <div className="h-2.5 bg-border rounded-full overflow-hidden">
+              <div className={`h-full rounded-full transition-all duration-500 ${scoreColor}`} style={{ width: `${result.score}%` }} />
+            </div>
           </div>
 
-          {/* Threat flags */}
+          {/* Explanation */}
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-foreground">{t.elderlyExplanation}</span>
+              <button
+                onClick={() => speak(explanation)}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                aria-label="Read aloud"
+              >
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <p className="text-sm leading-relaxed text-foreground">{explanation}</p>
+          </div>
+
+          {/* Flags */}
           {result.flags.length > 0 && (
-            <div className="bg-card rounded-2xl p-5">
-              <p className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wide">
-                {t.detectedSignals}
-              </p>
-              <div className="flex flex-wrap gap-2">
+            <div className="bg-card rounded-xl p-4 border border-border">
+              <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">{t.detectedSignals}</p>
+              <div className="flex flex-wrap gap-1.5">
                 {result.flags.map(flag => (
                   <span
                     key={flag.key}
-                    className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${
+                    className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                       flag.severity === "high"
-                        ? "bg-danger/10 text-danger border-danger/30"
-                        : flag.severity === "medium"
-                        ? "bg-warning/10 text-warning border-warning/30"
-                        : "bg-muted text-muted-foreground border-border"
+                        ? "bg-[hsl(var(--danger))]/10 text-[hsl(var(--danger))]"
+                        : "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]"
                     }`}
                   >
                     {locale === "ru" ? flag.label_ru : flag.label_en}
@@ -173,7 +174,7 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
             </div>
           )}
 
-          {/* Action buttons for danger */}
+          {/* Danger actions */}
           {result.verdict === "danger" && (
             <div className="grid grid-cols-1 gap-3">
               <SafeTouchButton label={t.blockBtn} variant="danger" onConfirm={() => {}} />
@@ -181,12 +182,11 @@ const MessageAnalyzer = ({ userMode, locale, t }: MessageAnalyzerProps) => {
             </div>
           )}
 
-          {/* Reset */}
           <button
             onClick={handleReset}
-            className="touch-zone w-full rounded-2xl p-4 bg-secondary text-secondary-foreground text-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-secondary/80"
+            className="w-full rounded-xl p-3.5 bg-secondary text-secondary-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:bg-secondary/80 transition-colors"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-4 h-4" />
             {t.checkAnother}
           </button>
         </div>

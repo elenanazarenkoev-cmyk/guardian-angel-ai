@@ -17,39 +17,18 @@ export interface AnalysisResult {
   flags: ThreatFlag[];
   explanation_en: string;
   explanation_ru: string;
-  elderlyExplanation_en: string;
-  elderlyExplanation_ru: string;
-  childExplanation_en: string;
-  childExplanation_ru: string;
 }
 
-// Pattern libraries (EN + RU)
-const URGENCY_PATTERNS = [
-  /\b(urgent|immediately|right now|act now|expires|last chance|limited time)\b/i,
-  /\b(срочно|немедленно|заблокирован|последний шанс|ограничен)/i,
-];
-const FEAR_PATTERNS = [
-  /\b(suspended|blocked|locked|arrested|warrant|virus|compromised|unusual activity)\b/i,
-  /\b(заблокирован|арест|вирус|подозрительн|несанкционированн)/i,
-];
-const MONEY_PATTERNS = [
-  /\b(transfer|send|wire|bitcoin|gift card|payment|refund|prize|won|€|£|pay now)\b/i,
-  /\b(перевод|переведи|оплат|приз|выигр|бесплатно|подарок)/i,
-];
-const SECRET_PATTERNS = [
-  /\b(pin|password|otp|code|verify|confirm|enter your|social security|bank details)\b/i,
-  /\b(код|пароль|пин|cvv|подтверждение|назовите)/i,
-];
-const LOOKALIKE_URL = /https?:\/\/[^\s]*(?:\.xyz|\.top|\.click|\.tk|bit\.ly|tinyurl|goo\.gl)[^\s]*/i;
-const SIMPLE_URL = /\b[\w-]+\.(xyz|tk|ml|ga|cf|click|buzz)\b/i;
-
 const FLAG_META: Record<string, { en: string; ru: string; severity: "low" | "medium" | "high" }> = {
-  urgency:            { en: "Creates urgency",     ru: "Создаёт срочность",       severity: "medium" },
-  fear:               { en: "Uses fear tactics",   ru: "Использует страх",        severity: "medium" },
-  money_request:      { en: "Asks for money",      ru: "Просит деньги",           severity: "high" },
-  credential_request: { en: "Asks for password",   ru: "Просит пароль/код",       severity: "high" },
-  suspicious_url:     { en: "Suspicious link",     ru: "Подозрительная ссылка",   severity: "medium" },
-  greed:              { en: "Lures with prizes",   ru: "Приманка выигрышем",      severity: "medium" },
+  urgency:            { en: "Creates urgency",        ru: "Создаёт срочность",          severity: "medium" },
+  fear:               { en: "Uses fear tactics",      ru: "Использует страх",           severity: "medium" },
+  money:              { en: "Requests money/payment",  ru: "Просит деньги",              severity: "high" },
+  credentials:        { en: "Asks for password/PIN",   ru: "Просит пароль/PIN",          severity: "high" },
+  url:                { en: "Suspicious link",         ru: "Подозрительная ссылка",       severity: "medium" },
+  freegame:           { en: "Free in-game currency",   ru: "Бесплатная игровая валюта",   severity: "high" },
+  secret:             { en: "Requests secrecy",        ru: "Просит хранить секрет",       severity: "high" },
+  giftcard:           { en: "Gift card payment",       ru: "Оплата подарочными картами",  severity: "high" },
+  greed:              { en: "Lures with prizes",       ru: "Приманка выигрышем",          severity: "medium" },
 };
 
 function buildFlag(key: string): ThreatFlag {
@@ -58,62 +37,44 @@ function buildFlag(key: string): ThreatFlag {
 }
 
 export function analyzeMessage(content: string): AnalysisResult {
+  const t = content.toLowerCase();
   const flags: string[] = [];
+  let score = 0;
 
-  const urgency = URGENCY_PATTERNS.some(p => p.test(content));
-  const fear = FEAR_PATTERNS.some(p => p.test(content));
-  const money = MONEY_PATTERNS.some(p => p.test(content));
-  const secret = SECRET_PATTERNS.some(p => p.test(content));
-  const suspUrl = LOOKALIKE_URL.test(content) || SIMPLE_URL.test(content);
+  const urgency = [/\burgent\b/,/\bimmediately\b/,/\bright now\b/,/\bexpires\b/,/\blast chance\b/,/\bwithin \d+ (hours?|minutes?)\b/,/\bсрочно\b/,/\bнемедленно\b/,/\bпрямо сейчас\b/,/\bистекает\b/];
+  const fear = [/\bsuspended\b/,/\blocked\b/,/\barrested\b/,/\bwarrant\b/,/\bvirus\b/,/\bcompromised\b/,/\bunusual activity\b/,/\bзаблокирован\b/,/\bвирус\b/,/\bподозрительн/];
+  const money = [/\btransfer\b/,/\bwire\b/,/\bbitcoin\b/,/\bgift card\b/,/\bpayment\b/,/\bpay now\b/,/[£€$]\d/,/\bперевод\b/,/\bоплатите\b/,/\bперевести\b/];
+  const cred = [/\bpin\b/,/\bpassword\b/,/\botp\b/,/\bverify your\b/,/\benter your\b/,/\bconfirm your\b/,/\bпин\b/,/\bпароль\b/,/\bподтвердите\b/];
+  const urlPatterns = /https?:\/\/[^\s]*(bit\.ly|tinyurl|\.xyz|\.top|\.click|\.tk|goo\.gl|-[a-z]+(\.com|\.net|\.org))[^\s]*/;
+  const suspDomain = /https?:\/\/[^\s]*[-](verification|secure|update|alert|confirm|support)[^\s]*/;
 
-  if (urgency) flags.push("urgency");
-  if (fear) flags.push("fear");
-  if (money) flags.push("money_request");
-  if (secret) flags.push("credential_request");
-  if (suspUrl) flags.push("suspicious_url");
+  if (urgency.some(r => r.test(t))) { flags.push("urgency"); score += 25; }
+  if (fear.some(r => r.test(t))) { flags.push("fear"); score += 25; }
+  if (money.some(r => r.test(t))) { flags.push("money"); score += 35; }
+  if (cred.some(r => r.test(t))) { flags.push("credentials"); score += 40; }
+  if (urlPatterns.test(t) || suspDomain.test(t)) { flags.push("url"); score += 30; }
+  if (/free.*currency|free.*coins|free.*robux|free.*vbucks/i.test(t)) { flags.push("freegame"); score += 40; }
+  if (/don't tell|keep.*secret|не говори|секрет/i.test(t)) { flags.push("secret"); score += 45; }
+  if (/gift card|подарочн.*карт/i.test(t)) { flags.push("giftcard"); score += 45; }
+  if (/выиграли|приз|бесплатно|подарок|free|won|prize|congratulations|поздравля/i.test(t)) { flags.push("greed"); score += 15; }
 
-  // Greed detection
-  const greedWords = /\b(выиграли|приз|бесплатно|подарок|free|won|prize|congratulations|поздравля)\b/i;
-  if (greedWords.test(content)) flags.push("greed");
-
-  const score =
-    (urgency ? 0.15 : 0) +
-    (fear ? 0.15 : 0) +
-    (money ? 0.25 : 0) +
-    (secret ? 0.25 : 0) +
-    (suspUrl ? 0.2 : 0) +
-    (flags.includes("greed") ? 0.1 : 0);
-
-  const clampedScore = Math.min(1, score);
-  const verdict: ThreatVerdict = clampedScore >= 0.4 ? "danger" : clampedScore >= 0.15 ? "warning" : "safe";
+  score = Math.min(100, score);
+  let verdict: ThreatVerdict;
+  if (score >= 60) verdict = "danger";
+  else if (score >= 25) verdict = "warning";
+  else verdict = "safe";
 
   return {
     verdict,
-    score: clampedScore,
+    score,
     flags: flags.map(buildFlag),
     explanation_en:
-      verdict === "safe" ? "This message looks safe." :
-      verdict === "warning" ? "This message has some suspicious signs. Check it carefully." :
-      "Warning: this message shows strong signs of a scam. Do not respond.",
+      verdict === "safe" ? "This message looks safe. No major red flags found." :
+      verdict === "warning" ? "This message has suspicious signs. Double-check before acting." :
+      "This is very likely a scam. Do not click, call, or transfer any money.",
     explanation_ru:
-      verdict === "safe" ? "Сообщение выглядит безопасно." :
-      verdict === "warning" ? "В сообщении есть подозрительные признаки. Проверьте его." :
-      "Внимание: сообщение похоже на мошенничество. Не отвечайте.",
-    elderlyExplanation_en:
-      verdict === "safe" ? "This is a normal, safe message. You can read it without worry." :
-      verdict === "warning" ? "This message raises some doubts. Better not to respond. Ask a trusted person." :
-      "This is a scam. They want to steal your money. Do not respond or click anything.",
-    elderlyExplanation_ru:
-      verdict === "safe" ? "Это обычное безопасное сообщение. Можете спокойно его прочитать." :
-      verdict === "warning" ? "Это сообщение вызывает сомнения. Лучше не отвечайте. Спросите у близкого человека." :
-      "Это обманщики. Они хотят украсть ваши деньги. Не отвечайте и не нажимайте ни на что.",
-    childExplanation_en:
-      verdict === "safe" ? "All good! This is a normal message. 😊" :
-      verdict === "warning" ? "Hmm, this message seems weird. Better ask an adult before doing anything." :
-      "These are bad people! They're lying and want to trick you. Don't touch this message. Show mom or dad!",
-    childExplanation_ru:
-      verdict === "safe" ? "Всё хорошо! Это обычное сообщение. 😊" :
-      verdict === "warning" ? "Хмм, это сообщение какое-то странное. Лучше спроси у взрослого." :
-      "Это плохие люди! Они врут и хотят обмануть. Не трогай это сообщение. Покажи маме или папе!",
+      verdict === "safe" ? "Сообщение выглядит безопасно. Серьёзных признаков угрозы не обнаружено." :
+      verdict === "warning" ? "Сообщение имеет подозрительные признаки. Проверьте перед тем как действовать." :
+      "Это почти наверняка мошенничество. Не нажимайте, не звоните, не переводите деньги.",
   };
 }
