@@ -7,12 +7,13 @@ import MessageAnalyzer from "@/components/MessageAnalyzer";
 import ScenarioSimulator from "@/components/ScenarioSimulator";
 import StopProtocol from "@/components/StopProtocol";
 import ThreatsBrowser from "@/components/ThreatsBrowser";
+import DeepfakeGuard from "@/components/DeepfakeGuard";
 import StatsDashboard from "@/components/StatsDashboard";
 import TabButton from "@/components/TabButton";
 import { toast } from "sonner";
 import { T, type Locale, type UserMode } from "@/lib/i18n";
 
-type TabKey = "home" | "analyzer" | "training" | "stop" | "threats" | "stats";
+type TabKey = "home" | "analyzer" | "training" | "stop" | "threats" | "deepfake" | "stats";
 
 const TAB_ICONS: Record<TabKey, string> = {
   home: "🏠",
@@ -20,6 +21,7 @@ const TAB_ICONS: Record<TabKey, string> = {
   training: "🎓",
   stop: "🛑",
   threats: "📚",
+  deepfake: "🎭",
   stats: "📊",
 };
 
@@ -87,7 +89,7 @@ const Index = () => {
       {/* Navigation */}
       <nav className="px-3 py-2.5" aria-label="Main navigation">
         <div className="flex gap-1 max-w-2xl mx-auto w-full overflow-x-auto scrollbar-hide">
-          {(["home", "analyzer", "training", "stop", "threats", "stats"] as TabKey[]).map(tab => (
+          {(["home", "analyzer", "training", "stop", "threats", "deepfake", "stats"] as TabKey[]).map(tab => (
             <TabButton
               key={tab}
               label={t.tabs[tab]}
@@ -114,6 +116,7 @@ const Index = () => {
         {activeTab === "training" && <ScenarioSimulator userMode={userMode} locale={locale} t={t} />}
         {activeTab === "stop" && <StopProtocol userMode={userMode} locale={locale} t={t} />}
         {activeTab === "threats" && <ThreatsBrowser userMode={userMode} locale={locale} t={t} />}
+        {activeTab === "deepfake" && <DeepfakeGuard userMode={userMode} locale={locale} t={t} />}
         {activeTab === "stats" && <StatsDashboard userMode={userMode} locale={locale} t={t} />}
       </main>
     </div>
