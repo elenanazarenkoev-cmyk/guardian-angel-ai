@@ -290,6 +290,83 @@ export const SCENARIOS: Scenario[] = [
       { type: "lesson", content: { en: "🛡 Rule for life: If someone online says 'don't tell your parents' — ALWAYS tell your parents. That's the biggest red flag of all.", ru: "🛡 Правило на всю жизнь: Если кто-то в интернете говорит 'не говори родителям' — ВСЕГДА рассказывай родителям." }}
     ]
   },
+  // ── DEEPFAKE scenarios ──
+  {
+    id: "df-scenario-ceo", cat: "deepfake", targets: ["adult"],
+    emoji: "👔", badge: "deepfake", badgeColor: "red",
+    title: { en: "Deepfake CEO Video Call ($25M Arup Case)", ru: "Дипфейк-звонок от CEO (Дело Arup на $25 млн)" },
+    desc: { en: "Your CFO appears on a video call with urgent wire transfer instructions", ru: "Ваш финансовый директор появляется на видеозвонке с срочными инструкциями по переводу" },
+    steps: [
+      { type: "message", content: {
+        en: "📹 You join a video conference. Your CFO and two other executives are already on the call. The CFO says:\n\n'Good, you're here. We need to process 15 wire transfers totaling $25 million to our Hong Kong accounts immediately. This is a confidential acquisition — do not discuss with anyone else. I'll send the account details now.'",
+        ru: "📹 Вы присоединяетесь к видеоконференции. Ваш финансовый директор и два других руководителя уже на звонке. CFO говорит:\n\n«Хорошо, ты здесь. Нам нужно обработать 15 банковских переводов на общую сумму $25 млн на наши счета в Гонконге немедленно. Это конфиденциальная сделка — ни с кем не обсуждай. Сейчас отправлю реквизиты.»"
+      }},
+      { type: "breathe" },
+      { type: "choice", prompt: { en: "Your CFO looks and sounds exactly like them. What do you do?", ru: "Ваш CFO выглядит и звучит точно как настоящий. Что вы делаете?" }, choices: [
+        { text: { en: "Process the transfers — it's the CFO on video", ru: "Выполнить переводы — это же CFO на видео" }, correct: false, feedback: { en: "❌ This is exactly what happened at Arup in 2024. All 'executives' were AI deepfakes. $25M was lost.", ru: "❌ Именно так произошло в Arup в 2024 году. Все «руководители» были ИИ-дипфейками. Потеряно $25 млн." }},
+        { text: { en: "Ask a personal question only the real CFO would know", ru: "Задать личный вопрос, на который ответит только настоящий CFO" }, correct: false, feedback: { en: "⚠️ Good instinct, but sophisticated deepfakes can use pre-collected personal info. Better to verify through a separate channel.", ru: "⚠️ Хороший инстинкт, но продвинутые дипфейки могут использовать заранее собранную информацию. Лучше проверить по отдельному каналу." }},
+        { text: { en: "Hang up and call CFO on their known personal number", ru: "Положить трубку и позвонить CFO на его известный личный номер" }, correct: true, feedback: { en: "✅ Correct! Always verify urgent financial requests through a separate, known communication channel. No legitimate executive would object.", ru: "✅ Верно! Всегда проверяйте срочные финансовые запросы через отдельный, известный канал связи." }},
+      ]},
+      { type: "lesson", content: { en: "🛡 REAL CASE: In 2024, engineering giant Arup lost $25M when an employee was tricked by a deepfake video call. All 'executives' were AI-generated.\n\n✅ Rule: ANY urgent financial request must be verified through a separate channel.\n✅ Use dual-approval processes for all wire transfers.\n✅ Establish code words for sensitive discussions.", ru: "🛡 РЕАЛЬНЫЙ СЛУЧАЙ: В 2024 году инженерный гигант Arup потерял $25 млн, когда сотрудник был обманут дипфейк-видеозвонком.\n\n✅ Правило: ЛЮБОЙ срочный финансовый запрос проверяйте по отдельному каналу.\n✅ Используйте двойное подтверждение для всех переводов.\n✅ Установите кодовые слова для конфиденциальных обсуждений." }}
+    ]
+  },
+  {
+    id: "df-scenario-grandchild", cat: "deepfake", targets: ["elderly"],
+    emoji: "👴", badge: "deepfake", badgeColor: "red",
+    title: { en: "Grandchild Voice Clone Emergency", ru: "Клон голоса внука — экстренная ситуация" },
+    desc: { en: "A call from your 'grandchild' in trouble, needing money urgently", ru: "Звонок от «внука» в беде, которому срочно нужны деньги" },
+    steps: [
+      { type: "message", content: {
+        en: "📞 Your phone rings. It sounds exactly like your grandson:\n\n*sobbing* 'Grandma! It's me, Alex! I got into a car accident and I've been arrested. I need $5,000 for bail right now. Please don't call mom — she'll be so disappointed in me. Can you buy gift cards and read me the numbers?'",
+        ru: "📞 Звонит телефон. Голос звучит точно как ваш внук:\n\n*всхлипывая* «Бабушка! Это я, Алёша! Я попал в аварию и меня задержали. Мне нужно 500 000 на залог прямо сейчас. Пожалуйста, не звони маме — она расстроится. Можешь купить подарочные карты и продиктовать мне номера?»"
+      }},
+      { type: "breathe" },
+      { type: "choice", prompt: { en: "The voice sounds exactly like your grandson. What do you do?", ru: "Голос звучит точно как ваш внук. Что вы делаете?" }, choices: [
+        { text: { en: "Buy gift cards and give the numbers — he's in trouble!", ru: "Купить подарочные карты и дать номера — он в беде!" }, correct: false, feedback: { en: "❌ This is the #1 deepfake scam targeting seniors. AI can clone a voice from just 3 seconds of social media audio. No bail is ever paid with gift cards.", ru: "❌ Это мошенничество №1 с дипфейками, нацеленное на пожилых. ИИ может клонировать голос из 3 секунд аудио из соцсетей. Залог никогда не оплачивают подарочными картами." }},
+        { text: { en: "Hang up and call grandson on his real number", ru: "Повесить трубку и позвонить внуку на его настоящий номер" }, correct: true, feedback: { en: "✅ Perfect! Always verify through a known number. Real grandchildren will be glad you checked.", ru: "✅ Отлично! Всегда проверяйте по известному номеру. Настоящий внук будет рад, что вы проверили." }},
+        { text: { en: "Ask him to prove it's him with a family code word", ru: "Попросить назвать семейное кодовое слово" }, correct: true, feedback: { en: "✅ Great if you have a code word! If not, hang up and call back on their known number.", ru: "✅ Отлично, если у вас есть кодовое слово! Если нет — повесьте трубку и перезвоните на его номер." }},
+      ]},
+      { type: "lesson", content: { en: "🛡 Voice cloning needs only 3 seconds of audio from social media.\n\n✅ Set up a family code word that only your family knows.\n✅ NEVER pay bail with gift cards — this is always a scam.\n✅ 'Don't tell parents' = biggest red flag.\n✅ Hang up and call the person directly.", ru: "🛡 Для клонирования голоса нужно всего 3 секунды аудио из соцсетей.\n\n✅ Установите семейное кодовое слово.\n✅ НИКОГДА не платите залог подарочными картами — это всегда мошенничество.\n✅ «Не говори родителям» = главный красный флаг.\n✅ Повесьте трубку и позвоните человеку напрямую." }}
+    ]
+  },
+  {
+    id: "df-scenario-influencer", cat: "deepfake", targets: ["child"],
+    emoji: "🎭", badge: "deepfake", badgeColor: "red",
+    title: { en: "Fake YouTuber Deepfake DM", ru: "Фейковый ютубер — дипфейк-сообщение" },
+    desc: { en: "Your favorite YouTuber sends you a personal video message with a 'special offer'", ru: "Твой любимый ютубер отправляет личное видеосообщение с «особым предложением»" },
+    steps: [
+      { type: "message", content: {
+        en: "📱 You get a DM with a video from what looks like your favorite YouTuber:\n\n🎥 'Hey! It's me, MrBeast! I'm giving away 10,000 FREE Robux to my top 100 fans this week! You've been selected! Just click the link below and enter your Roblox username and password to claim your reward. Hurry — only 12 spots left! 🎉'\n\nThe video looks real — same face, same voice!",
+        ru: "📱 Тебе приходит ЛС с видео от твоего любимого ютубера:\n\n🎥 «Привет! Это я, MrBeast! Дарю 10 000 БЕСПЛАТНЫХ Робуксов 100 лучшим фанатам на этой неделе! Ты выбран! Просто перейди по ссылке и введи логин и пароль от Roblox, чтобы забрать награду. Спеши — осталось 12 мест! 🎉»\n\nВидео выглядит настоящим — то же лицо, тот же голос!"
+      }},
+      { type: "breathe" },
+      { type: "choice", prompt: { en: "The video looks exactly like the real YouTuber! What do you do?", ru: "Видео выглядит точно как настоящий ютубер! Что ты делаешь?" }, choices: [
+        { text: { en: "Click the link and enter my password — it's really them!", ru: "Перейти по ссылке и ввести пароль — это же правда они!" }, correct: false, feedback: { en: "❌ NEVER enter your password from a DM link! This is a deepfake — AI can copy anyone's face and voice. Your account would be stolen.", ru: "❌ НИКОГДА не вводи пароль по ссылке из ЛС! Это дипфейк — ИИ может скопировать любое лицо и голос. Твой аккаунт украдут." }},
+        { text: { en: "Check if this is from the official verified channel", ru: "Проверить, это с официального подтверждённого канала?" }, correct: true, feedback: { en: "✅ Smart! Check the account — real influencers have verified badges and millions of followers. Fake accounts have few followers and were recently created.", ru: "✅ Молодец! Проверь аккаунт — у настоящих блогеров есть галочка и миллионы подписчиков. У фейков мало подписчиков и аккаунт создан недавно." }},
+        { text: { en: "Tell a parent or trusted adult about this", ru: "Рассказать родителям или взрослому, которому доверяю" }, correct: true, feedback: { en: "✅ Always the right choice! Adults can help you check if something is real or fake.", ru: "✅ Всегда правильный выбор! Взрослые помогут проверить, настоящее это или фейк." }},
+      ]},
+      { type: "lesson", content: { en: "🛡 AI can now copy ANYONE's face and voice from their videos.\n\n✅ Real YouTubers NEVER ask for your password in DMs.\n✅ Check for verified badge ✓ and follower count.\n✅ If it asks for your password — it's ALWAYS a scam.\n✅ When in doubt — tell a parent!", ru: "🛡 ИИ теперь может скопировать лицо и голос ЛЮБОГО человека из их видео.\n\n✅ Настоящие ютуберы НИКОГДА не просят пароль в ЛС.\n✅ Проверяй наличие галочки ✓ и количество подписчиков.\n✅ Если просят пароль — это ВСЕГДА мошенничество.\n✅ Сомневаешься — расскажи родителям!" }}
+    ]
+  },
+  {
+    id: "df-scenario-bank", cat: "deepfake", targets: ["elderly", "adult"],
+    emoji: "🏦", badge: "deepfake", badgeColor: "red",
+    title: { en: "Deepfake Bank Officer Video Call", ru: "Дипфейк-видеозвонок от сотрудника банка" },
+    desc: { en: "A 'bank officer' calls via video about suspicious activity on your account", ru: "«Сотрудник банка» звонит по видео о подозрительной активности на вашем счёте" },
+    steps: [
+      { type: "message", content: {
+        en: "📹 You receive a video call from a person in a bank uniform with an official-looking badge:\n\n'Good afternoon. I'm calling from your bank's security department. We've detected 3 unauthorized transactions on your account totaling $12,000. To protect your savings, you need to transfer your funds to a temporary safe account immediately. I'll guide you through the process. Please have your card and PIN ready.'",
+        ru: "📹 Вам поступает видеозвонок от человека в форме банка с официальным удостоверением:\n\n«Добрый день. Я звоню из службы безопасности вашего банка. Мы обнаружили 3 несанкционированные транзакции на вашем счёте на общую сумму 1 200 000 руб. Для защиты ваших сбережений нужно перевести средства на временный безопасный счёт немедленно. Я проведу вас через процесс. Приготовьте карту и PIN-код.»"
+      }},
+      { type: "breathe" },
+      { type: "choice", prompt: { en: "The person looks professional in a bank uniform. What do you do?", ru: "Человек выглядит профессионально в форме банка. Что вы делаете?" }, choices: [
+        { text: { en: "Follow instructions — they look official", ru: "Следовать инструкциям — они выглядят официально" }, correct: false, feedback: { en: "❌ Banks NEVER initiate video calls or ask you to transfer to 'safe accounts'. The uniform and badge are AI-generated.", ru: "❌ Банки НИКОГДА не звонят по видео и не просят переводить на «безопасные счета». Форма и удостоверение сгенерированы ИИ." }},
+        { text: { en: "Hang up and call the bank's official number myself", ru: "Повесить трубку и позвонить на официальный номер банка" }, correct: true, feedback: { en: "✅ Correct! Always call your bank yourself using the number on your card or their official website.", ru: "✅ Верно! Всегда звоните в банк сами по номеру с карты или с официального сайта." }},
+        { text: { en: "Ask for their employee ID to verify later", ru: "Спросить табельный номер для проверки позже" }, correct: false, feedback: { en: "⚠️ They'll give you a fake ID. Don't engage — hang up immediately and call your bank directly.", ru: "⚠️ Они дадут вам фальшивый номер. Не общайтесь — сразу повесьте трубку и позвоните в банк." }},
+      ]},
+      { type: "lesson", content: { en: "🛡 Banks NEVER:\n• Initiate video calls to customers\n• Ask to transfer to 'safe accounts'\n• Ask for your PIN or full card number\n• Create urgency about 'unauthorized transactions'\n\n✅ Always call the bank yourself using the number on your card.", ru: "🛡 Банки НИКОГДА:\n• Не звонят клиентам по видео\n• Не просят переводить на «безопасные счета»\n• Не спрашивают PIN или полный номер карты\n• Не создают срочность о «несанкционированных операциях»\n\n✅ Всегда звоните в банк сами по номеру с карты." }}
+    ]
+  },
 ];
 
 export const SCENARIO_CATEGORIES = [
@@ -298,5 +375,6 @@ export const SCENARIO_CATEGORIES = [
   { key: "email", label_en: "📧 Email", label_ru: "📧 Email" },
   { key: "sms", label_en: "📱 SMS", label_ru: "📱 SMS" },
   { key: "call", label_en: "📞 Calls", label_ru: "📞 Звонки" },
+  { key: "deepfake", label_en: "🎭 Deepfake", label_ru: "🎭 Дипфейк" },
   { key: "child", label_en: "🧒 Kids", label_ru: "🧒 Дети" },
 ];
