@@ -29,6 +29,10 @@ const FLAG_META: Record<string, { en: string; ru: string; severity: "low" | "med
   secret:             { en: "Requests secrecy",        ru: "Просит хранить секрет",       severity: "high" },
   giftcard:           { en: "Gift card payment",       ru: "Оплата подарочными картами",  severity: "high" },
   greed:              { en: "Lures with prizes",       ru: "Приманка выигрышем",          severity: "medium" },
+  deepfake_video:     { en: "Deepfake video call signs", ru: "Признаки дипфейк-видеозвонка", severity: "high" },
+  deepfake_voice:     { en: "Voice clone indicators",    ru: "Признаки клонирования голоса", severity: "high" },
+  wire_transfer:      { en: "Urgent wire transfer",      ru: "Срочный банковский перевод",   severity: "high" },
+  impersonation:      { en: "Authority impersonation",   ru: "Выдача себя за должностное лицо", severity: "high" },
 };
 
 function buildFlag(key: string): ThreatFlag {
@@ -57,6 +61,12 @@ export function analyzeMessage(content: string): AnalysisResult {
   if (/don't tell|keep.*secret|не говори|секрет/i.test(t)) { flags.push("secret"); score += 45; }
   if (/gift card|подарочн.*карт/i.test(t)) { flags.push("giftcard"); score += 45; }
   if (/выиграли|приз|бесплатно|подарок|free|won|prize|congratulations|поздравля/i.test(t)) { flags.push("greed"); score += 15; }
+
+  // Deepfake-specific patterns
+  if (/video call|видеозвонок|видео звонок|zoom|teams call|face.*time/i.test(t) && (money.some(r => r.test(t)) || cred.some(r => r.test(t)))) { flags.push("deepfake_video"); score += 35; }
+  if (/voice|голос|sounds like|звучит как|это я|it's me/i.test(t) && (urgency.some(r => r.test(t)) || money.some(r => r.test(t)))) { flags.push("deepfake_voice"); score += 35; }
+  if (/wire transfer|bank transfer|банковский перевод|swift|перевести на счёт|safe account|безопасный счёт/i.test(t)) { flags.push("wire_transfer"); score += 40; }
+  if (/ceo|cfo|director|директор|руководител|начальник|security department|служба безопасности|bank officer|сотрудник банка/i.test(t)) { flags.push("impersonation"); score += 30; }
 
   score = Math.min(100, score);
   let verdict: ThreatVerdict;
