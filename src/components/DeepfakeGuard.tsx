@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ShieldAlert, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { Eye, ChevronDown, ChevronUp, AlertTriangle, TrendingUp } from "lucide-react";
 import type { Locale, Translations, UserMode } from "@/lib/i18n";
-import { DEEPFAKE_THREATS, type DeepfakeThreat } from "@/lib/deepfakeData";
+import { DEEPFAKE_THREATS, DEEPFAKE_STATS, type DeepfakeThreat } from "@/lib/deepfakeData";
 
 interface Props {
   userMode: UserMode;
@@ -36,20 +36,20 @@ const DeepfakeGuard = ({ userMode, locale }: Props) => {
       ? "Узнай, как мошенники используют ИИ, чтобы притворяться другими людьми! 🤖"
       : userMode === "elderly"
         ? "Научитесь распознавать поддельные голоса и видео, созданные искусственным интеллектом"
-        : "Как распознать deepfake: голосовые клоны, видео-фейки и ИИ-манипуляции"
+        : "Как распознать deepfake: голосовые клоны, видео-фейки и ИИ-манипуляции в B2B и личных финансах"
     : userMode === "child"
       ? "Learn how scammers use AI to pretend to be other people! 🤖"
       : userMode === "elderly"
         ? "Learn to recognize fake voices and videos created by artificial intelligence"
-        : "How to spot deepfakes: voice clones, fake videos, and AI manipulation";
+        : "How to spot deepfakes: voice clones, fake videos, and AI manipulation in B2B and personal finance";
 
   const infoBox = locale === "ru"
     ? userMode === "child"
       ? "⚠️ Мошенники могут скопировать голос или лицо любого человека с помощью компьютера. Даже если звонящий выглядит и звучит как знакомый — всегда проверяй!"
-      : "⚠️ Технологии дипфейков позволяют в реальном времени подделывать голос и видео любого человека. Достаточно нескольких секунд записи из соцсетей для создания убедительного клона."
+      : "⚠️ В 2024 году компания Arup потеряла $25 млн из-за дипфейк-видеозвонка, где все «руководители» были сгенерированы ИИ. Достаточно 3 секунд аудио из соцсетей для создания убедительного клона голоса."
     : userMode === "child"
       ? "⚠️ Scammers can copy anyone's voice or face using a computer. Even if a caller looks and sounds familiar — always verify!"
-      : "⚠️ Deepfake technology can fake anyone's voice and video in real-time. Just a few seconds of social media audio is enough to create a convincing clone.";
+      : "⚠️ In 2024, Arup lost $25M via a deepfake video call where all 'executives' were AI-generated. Just 3 seconds of social media audio is enough to clone a convincing voice.";
 
   const audienceFilters = [
     { key: "all" as const, en: "For You", ru: "Для вас" },
@@ -66,8 +66,23 @@ const DeepfakeGuard = ({ userMode, locale }: Props) => {
         <p className="text-sm text-muted-foreground">{desc}</p>
       </div>
 
+      {/* Stats bar — adults & elderly only */}
+      {userMode !== "child" && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {DEEPFAKE_STATS.slice(0, 3).map((stat, i) => (
+            <div key={i} className="bg-card rounded-xl p-3 border border-border text-center">
+              <p className="text-lg sm:text-xl font-extrabold text-primary">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight mt-0.5">
+                {locale === "ru" ? stat.label.ru : stat.label.en}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Warning box */}
-      <div className="bg-[hsl(var(--danger))]/10 border border-[hsl(var(--danger))]/20 rounded-2xl p-4">
+      <div className="bg-[hsl(var(--danger))]/10 border border-[hsl(var(--danger))]/20 rounded-2xl p-4 flex gap-3 items-start">
+        <AlertTriangle className="w-5 h-5 text-[hsl(var(--danger))] flex-shrink-0 mt-0.5" />
         <p className="text-sm text-foreground leading-relaxed">{infoBox}</p>
       </div>
 
@@ -117,6 +132,15 @@ const DeepfakeGuard = ({ userMode, locale }: Props) => {
 
               {isOpen && (
                 <div className="px-4 pb-4 space-y-3 animate-in fade-in duration-200">
+                  {/* Real case highlight */}
+                  {threat.realCase && (
+                    <div className="bg-[hsl(var(--danger))]/5 border border-[hsl(var(--danger))]/15 rounded-xl p-3">
+                      <p className="text-xs leading-relaxed text-foreground">
+                        {locale === "ru" ? threat.realCase.ru : threat.realCase.en}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Detection tips */}
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -167,6 +191,32 @@ const DeepfakeGuard = ({ userMode, locale }: Props) => {
           </div>
         )}
       </div>
+
+      {/* AI defense info — adults only */}
+      {userMode === "adult" && (
+        <div className="bg-card rounded-2xl p-4 border border-border space-y-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <h4 className="text-sm font-bold text-foreground">
+              {locale === "ru" ? "ИИ на защите" : "AI Defense Systems"}
+            </h4>
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1.5 leading-relaxed">
+            <p>{locale === "ru"
+              ? "• Графовые нейронные сети (GNN) анализируют связи между транзакциями в реальном времени, заменяя устаревшие системы на основе правил"
+              : "• Graph Neural Networks (GNN) analyze transaction relationships in real-time, replacing legacy rule-based systems"}</p>
+            <p>{locale === "ru"
+              ? "• Visa выявила мошеннические схемы на $1 млрд с помощью генеративного ИИ, анализируя миллиарды транзакций"
+              : "• Visa detected $1B+ in fraud patterns using generative AI, analyzing billions of transactions"}</p>
+            <p>{locale === "ru"
+              ? "• Федеративное обучение повышает точность до 99% без раскрытия данных между учреждениями"
+              : "• Federated learning achieves 99% accuracy without exposing raw data between institutions"}</p>
+            <p>{locale === "ru"
+              ? "• Объясняемый ИИ (XAI) соответствует требованиям Закона ЕС об ИИ 2026 года"
+              : "• Explainable AI (XAI) meets EU AI Act 2026 compliance requirements"}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
