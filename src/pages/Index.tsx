@@ -1,27 +1,23 @@
 import { useState, useCallback } from "react";
-import { ShieldCheck, Globe } from "lucide-react";
 import Onboarding from "@/components/Onboarding";
 import HomeScreen from "@/components/HomeScreen";
-import UserModeToggle from "@/components/UserModeToggle";
 import MessageAnalyzer from "@/components/MessageAnalyzer";
 import ScenarioSimulator from "@/components/ScenarioSimulator";
 import StopProtocol from "@/components/StopProtocol";
-import ThreatsBrowser from "@/components/ThreatsBrowser";
-import DeepfakeGuard from "@/components/DeepfakeGuard";
+import KnowledgeHub from "@/components/KnowledgeHub";
 import StatsDashboard from "@/components/StatsDashboard";
 import TabButton from "@/components/TabButton";
 import { toast } from "sonner";
 import { T, type Locale, type UserMode } from "@/lib/i18n";
 
-type TabKey = "home" | "analyzer" | "training" | "stop" | "threats" | "deepfake" | "stats";
+type TabKey = "home" | "analyzer" | "training" | "stop" | "knowledge" | "stats";
 
 const TAB_ICONS: Record<TabKey, string> = {
   home: "🏠",
   analyzer: "🔍",
   training: "🎓",
   stop: "🛑",
-  threats: "📚",
-  deepfake: "🎭",
+  knowledge: "📚",
   stats: "📊",
 };
 
