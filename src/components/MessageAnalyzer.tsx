@@ -128,15 +128,10 @@ const MessageAnalyzer = ({ locale, t }: MessageAnalyzerProps) => {
             locale={locale}
           />
 
-          {/* Score bar */}
+          {/* Risk Gauge */}
           <div className="bg-card rounded-xl p-4 border border-border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t.riskLabel}</span>
-              <span className="text-sm font-bold text-foreground">{result.score}%</span>
-            </div>
-            <div className="h-2.5 bg-border rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-500 ${scoreColor}`} style={{ width: `${result.score}%` }} />
-            </div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center mb-2">{t.riskLabel}</p>
+            <RiskGauge score={result.score} locale={locale} />
           </div>
 
           {/* Explanation */}
