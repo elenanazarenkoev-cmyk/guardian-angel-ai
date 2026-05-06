@@ -55,12 +55,6 @@ const MessageAnalyzer = ({ locale, t }: MessageAnalyzerProps) => {
     ? locale === "ru" ? result.explanation_ru : result.explanation_en
     : "";
 
-  const scoreColor = result
-    ? result.verdict === "danger" ? "bg-[hsl(var(--danger))]"
-    : result.verdict === "warning" ? "bg-[hsl(var(--warning))]"
-    : "bg-[hsl(var(--safe))]"
-    : "";
-
   return (
     <div className="space-y-4">
       {/* Header */}
