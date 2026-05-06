@@ -144,6 +144,7 @@ export const T = {
       stop: "S.T.O.P.",
       threats: "База угроз",
       deepfake: "Дипфейк",
+      knowledge: "Знания",
       stats: "Прогресс",
     },
     modeLabel: "Режим:",
