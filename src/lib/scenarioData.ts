@@ -462,5 +462,6 @@ export const SCENARIO_CATEGORIES = [
   { key: "sms", label_en: "📱 SMS", label_ru: "📱 SMS" },
   { key: "call", label_en: "📞 Calls", label_ru: "📞 Звонки" },
   { key: "deepfake", label_en: "🎭 Deepfake", label_ru: "🎭 Дипфейк" },
+  { key: "social", label_en: "💔 Romance", label_ru: "💔 Знакомства" },
   { key: "child", label_en: "🧒 Kids", label_ru: "🧒 Дети" },
 ];
