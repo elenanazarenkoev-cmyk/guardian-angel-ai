@@ -12,6 +12,7 @@ export const T = {
       stop: "S.T.O.P.",
       threats: "Library",
       deepfake: "Deepfake",
+      knowledge: "Knowledge",
       stats: "Progress",
     },
     modeLabel: "Mode:",
