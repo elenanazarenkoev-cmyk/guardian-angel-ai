@@ -367,6 +367,92 @@ export const SCENARIOS: Scenario[] = [
       { type: "lesson", content: { en: "🛡 Banks NEVER:\n• Initiate video calls to customers\n• Ask to transfer to 'safe accounts'\n• Ask for your PIN or full card number\n• Create urgency about 'unauthorized transactions'\n\n✅ Always call the bank yourself using the number on your card.", ru: "🛡 Банки НИКОГДА:\n• Не звонят клиентам по видео\n• Не просят переводить на «безопасные счета»\n• Не спрашивают PIN или полный номер карты\n• Не создают срочность о «несанкционированных операциях»\n\n✅ Всегда звоните в банк сами по номеру с карты." }}
     ]
   },
+
+  // ── REAL CASE: Hong Kong $25M Deepfake Video Call (2024) ──
+  {
+    id: "bec2", cat: "deepfake", targets: ["adult"],
+    emoji: "🤖", badge: "deepfake", badgeColor: "red",
+    title: { en: '"CEO on Video Call" Deepfake BEC (Real: Hong Kong 2024)', ru: 'ИИ-дипфейк CEO на видеозвонке (Гонконг 2024)' },
+    desc: { en: "Finance employee tricked into $25M transfer via deepfake video call", ru: "Сотрудник перевёл $25 млн после видеозвонка с «директором»" },
+    steps: [
+      { type: "message", content: {
+        en: "📱 WhatsApp from your CFO's number:\n\n\"Join urgent video call NOW. Extreme confidentiality. Do not email or discuss with anyone.\"\n\n📹 You join. On screen: CFO, CEO and two colleagues you recognise. They need HK$200M ($25.6M) transferred to a new account BEFORE markets open.\n\n⚠️ Everyone looks and sounds real. The CFO uses your nickname.",
+        ru: "📱 WhatsApp с номера финдиректора:\n\n«Срочный видеозвонок. Крайне конфиденциально. Никому не пишите.»\n\n📹 На экране: CFO, CEO и двое знакомых коллег. Нужно перевести HK$200 млн ($25,6 млн) на новый счёт ДО открытия рынков.\n\n⚠️ Все выглядят и звучат реально. Директор называет вас по прозвищу."
+      }},
+      { type: "breathe", content: {
+        en: "DEEPFAKE VIDEO CALL ATTACK — exactly how $25M was stolen in Hong Kong, 2024. The 'colleagues' were AI-generated from public conference footage.\n\nRed flags:\n• 'Don't tell anyone' — eliminates verification\n• Extreme urgency (before markets open)\n• New account, never used\n• Initiated via WhatsApp, not corporate systems",
+        ru: "АТАКА DEEPFAKE ВИДЕОЗВОНКА — так в Гонконге в 2024 году украли $25 млн. «Коллеги» сгенерированы ИИ из публичных видео конференций.\n\nКрасные флаги:\n• «Никому не говорите» — исключает проверку\n• Крайняя срочность\n• Новый, ранее не использованный счёт\n• Запрос через WhatsApp, не корп. системы"
+      }},
+      { type: "choice", prompt: { en: "What should you do?", ru: "Что вы должны сделать?" }, choices: [
+        { text: { en: "Transfer the money — I saw everyone on video", ru: "Перевести — я видел всех на видео" }, correct: false,
+          feedback: { en: "DEEPFAKE TRAP. AI generates photorealistic video in real time. Real authorisation always requires two independent verifications.", ru: "ЛОВУШКА. ИИ генерирует фотореалистичное видео в реальном времени. Авторизация всегда требует двух независимых подтверждений." }},
+        { text: { en: "End call. Verify via the official corporate phone", ru: "Закончить звонок и позвонить по корп. номеру" }, correct: true,
+          feedback: { en: "Correct. In the real Hong Kong case, doing exactly this would have saved $25M.", ru: "Правильно. В реальном случае Гонконга это сохранило бы $25 млн." }},
+        { text: { en: "Ask the 'CFO' a question only they would know", ru: "Задать вопрос, который знает только директор" }, correct: false,
+          feedback: { en: "Insufficient. Attackers research targets via LinkedIn and may know personal details. Verify via a SEPARATE channel.", ru: "Недостаточно. Атакующие изучают цели через LinkedIn. Проверяйте через ОТДЕЛЬНЫЙ канал." }},
+      ]},
+      { type: "lesson", content: {
+        en: "🛡️ Deepfake protocol:\n1. Never transfer money based on a video call alone\n2. Large transfers require independent voice verification\n3. Ask for an unexpected gesture (touch left ear) — deepfakes struggle with novel commands\n4. 'Do not tell anyone' = automatic red flag",
+        ru: "🛡️ Протокол:\n1. Никогда не переводить деньги только по видеозвонку\n2. Крупные переводы — независимая голосовая проверка\n3. Просите неожиданный жест (тронуть левое ухо) — дипфейки плохо справляются\n4. «Никому не говорить» = автоматический красный флаг"
+      }},
+    ]
+  },
+
+  // ── REAL CASE: "Hi Mum" WhatsApp scam (UK 2022-2024) ──
+  {
+    id: "himum1", cat: "sms", targets: ["adult", "elderly"],
+    emoji: "📲", badge: "smishing", badgeColor: "yellow",
+    title: { en: '"Hi Mum/Dad" WhatsApp Scam (UK 2022-2024)', ru: 'Скам «Привет мама/папа» в WhatsApp' },
+    desc: { en: 'Scammer pretends to be your child texting from a "new number"', ru: 'Мошенник пишет от имени ребёнка с «нового номера»' },
+    steps: [
+      { type: "message", content: {
+        en: "📲 WhatsApp — Unknown number:\n\n\"Hi Mum! It's me. I dropped my phone in the toilet, had to get a new one 😩 This is my new number, save it!\n\nI have bills due today and can't access my bank from this new phone yet. Can you send me £500? I'll pay you back tomorrow, promise 🙏\"",
+        ru: "📲 WhatsApp — Неизвестный номер:\n\n«Привет мама! Это я. Уронил телефон, пришлось купить новый 😩 Это мой новый номер, сохрани!\n\nСегодня нужно оплатить счета, а с нового телефона не могу зайти в банк. Можешь перевести 50 000? Верну завтра, обещаю 🙏»"
+      }},
+      { type: "choice", prompt: { en: "What do you do?", ru: "Что вы делаете?" }, choices: [
+        { text: { en: "Send the money — my child always pays back", ru: "Перевести — ребёнок всегда возвращает" }, correct: false,
+          feedback: { en: "UK Finance reported £1.5M lost to this exact scam in 2022. The 'broken phone' story is the signature.", ru: "В 2022 году в Великобритании потеряли £1,5 млн на этой схеме. История «сломанного телефона» — фирменный знак." }},
+        { text: { en: "Call my child on their OLD saved number to verify", ru: "Позвонить на СТАРЫЙ сохранённый номер ребёнка" }, correct: true,
+          feedback: { en: "Correct. If the phone is truly broken, they can borrow a friend's. If they can't speak — that confirms it's a scam.", ru: "Правильно. Если телефон действительно сломан, они могут позвонить с чужого. Если не отвечают — это подтверждает скам." }},
+        { text: { en: "Reply asking for proof it's really them", ru: "Ответить и попросить доказательства" }, correct: false,
+          feedback: { en: "Scammers research social media. They may know your child's nickname. Always verify via the OLD known number.", ru: "Мошенники изучают соцсети. Могут знать прозвище. Проверяйте только через СТАРЫЙ номер." }},
+      ]},
+      { type: "lesson", content: {
+        en: "🛡️ Rule: any urgent money request from a 'new number' = stop and call the OLD saved number first.",
+        ru: "🛡️ Правило: любая срочная просьба о деньгах с «нового номера» = остановитесь и позвоните на СТАРЫЙ номер."
+      }},
+    ]
+  },
+
+  // ── REAL CASE: Pig Butchering crypto romance scam ($75B+ globally) ──
+  {
+    id: "pig1", cat: "social", targets: ["adult", "elderly"],
+    emoji: "🐷", badge: "romance", badgeColor: "red",
+    title: { en: '"Pig Butchering" Crypto Romance Scam ($75B+)', ru: 'Криптороманс «Разделать свинью» ($75+ млрд)' },
+    desc: { en: 'Weeks of "friendship", then a fake crypto platform.', ru: 'Недели «дружбы», потом поддельная криптоплатформа.' },
+    steps: [
+      { type: "message", content: {
+        en: '💬 Dating app / LinkedIn DM, 3 weeks ago:\n"Hi! I think we matched by mistake — wrong city! But I love your profile. I\'m Mei, financial analyst in Singapore."\n\n[3 weeks of warm daily messages, photos, videos]\n\n📲 TODAY: "My uncle runs a crypto trading platform with AI — I made £12,000 last month from £2,000! I can guide you. Only sharing with close friends."',
+        ru: '💬 Знакомство 3 недели назад:\n«Привет! Кажется, мы совпали по ошибке — другой город! Но мне нравится твой профиль. Я Мэй, финансовый аналитик из Сингапура.»\n\n[3 недели тёплых ежедневных сообщений, фото, видео]\n\n📲 СЕГОДНЯ: «Мой дядя ведёт криптоплатформу с ИИ — я заработала £12 000 с £2 000 за месяц! Могу помочь.»'
+      }},
+      { type: "breathe", content: {
+        en: "'Pig Butchering' (Sha Zhu Pan): victim is 'fattened' with weeks of attention before being 'slaughtered'. $75B stolen globally 2021-2024. Platform shows real profits first — then withdrawals are blocked behind 'taxes' and 'fees'.",
+        ru: "«Разделать свинью» (Sha Zhu Pan): жертву «откармливают» неделями внимания. $75 млрд украдено в мире за 2021-2024. Платформа сначала показывает реальную прибыль — потом выплаты блокируются «налогами» и «сборами»."
+      }},
+      { type: "choice", prompt: { en: "What do you do?", ru: "Что вы делаете?" }, choices: [
+        { text: { en: "Invest £500 to test — Mei has been a real friend", ru: "Инвестировать £500 для теста" }, correct: false,
+          feedback: { en: "The first 'profit' will look real — that's the trap.", ru: "Первая «прибыль» будет выглядеть реально — в этом ловушка." }},
+        { text: { en: "Stop. Verify the platform via Google + financial regulator", ru: "Остановиться. Проверить платформу через Google + регуляторов" }, correct: true,
+          feedback: { en: "Correct. Search '[platform] scam' + check FCA/SEC registers.", ru: "Правильно. Ищите «[платформа] scam» + проверяйте реестры регуляторов." }},
+        { text: { en: "Ask for a video call to confirm Mei is real", ru: "Сделать видеозвонок" }, correct: false,
+          feedback: { en: "Pig butchering operations DO video call — often using trafficking victims. The platform itself is the fraud.", ru: "Операции «разделать свинью» ДЕЛАЮТ видеозвонки — часто с жертвами торговли людьми." }},
+      ]},
+      { type: "lesson", content: {
+        en: "🛡️ Rules: 1) Unsolicited investment advice from an online contact = red flag. 2) Profits over 15% monthly are fake. 3) Any 'fee to withdraw' means money is already gone.",
+        ru: "🛡️ Правила: 1) Незапрошенный инвест-совет = красный флаг. 2) Прибыль >15% в месяц — фикция. 3) «Сбор за вывод» = деньги уже потеряны."
+      }},
+    ]
+  },
 ];
 
 export const SCENARIO_CATEGORIES = [
@@ -376,5 +462,6 @@ export const SCENARIO_CATEGORIES = [
   { key: "sms", label_en: "📱 SMS", label_ru: "📱 SMS" },
   { key: "call", label_en: "📞 Calls", label_ru: "📞 Звонки" },
   { key: "deepfake", label_en: "🎭 Deepfake", label_ru: "🎭 Дипфейк" },
+  { key: "social", label_en: "💔 Romance", label_ru: "💔 Знакомства" },
   { key: "child", label_en: "🧒 Kids", label_ru: "🧒 Дети" },
 ];
