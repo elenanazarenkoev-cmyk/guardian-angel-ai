@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Volume2, RotateCcw } from "lucide-react";
 import ThreatIndicator from "./ThreatIndicator";
+import RiskGauge from "./RiskGauge";
 import SafeTouchButton from "./SafeTouchButton";
 import { analyzeMessage, type SourceType, type AnalysisResult } from "@/lib/threatAnalyzer";
 import type { Locale, Translations } from "@/lib/i18n";
