@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MessageAnalyzer from "@/components/MessageAnalyzer";
-import { translations } from "@/lib/i18n";
+import { T as translations } from "@/lib/i18n";
 
 const CASES = [
   { name: "safe", text: "Hi, are we still meeting tomorrow at 10?" },
