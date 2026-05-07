@@ -3,7 +3,7 @@ import { analyzeMessage, type ThreatVerdict } from "@/lib/threatAnalyzer";
 
 const SAMPLES: Record<ThreatVerdict, string> = {
   safe: "Hi, are we still meeting for coffee tomorrow at 10?",
-  warning: "Congratulations! You won a free prize, claim your reward now.",
+  warning: "Congratulations! You are a winner — claim your free prize voucher within 24 hours.",
   danger: "URGENT: your bank account is suspended. Verify your PIN at http://sber-secure.xyz/login",
 };
 
