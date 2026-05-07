@@ -176,12 +176,12 @@ export function analyzeMessage(content: string): AnalysisResult {
     brands,
     flags: unique.map(buildFlag),
     explanation_en:
-      verdict === "safe"    ? "This message looks safe. No major red flags found." :
-      verdict === "warning" ? "This message has suspicious signs. Double-check via an independent channel before acting." :
-                              "This is very likely a scam. Do not click, call back, or transfer any money. Verify via an official number you find yourself.",
+      verdict === "safe"    ? "Looks safe — no red flags detected." :
+      verdict === "warning" ? "Suspicious signs found. Verify through an independent channel before acting." :
+                              "Likely a scam. Don't click, call back, or pay. Confirm via an official number you find yourself.",
     explanation_ru:
-      verdict === "safe"    ? "Сообщение выглядит безопасно. Серьёзных признаков угрозы не обнаружено." :
-      verdict === "warning" ? "Сообщение имеет подозрительные признаки. Проверьте через независимый канал перед действиями." :
-                              "Это почти наверняка мошенничество. Не нажимайте, не перезванивайте, не переводите деньги. Проверьте по официальному номеру, который вы нашли сами.",
+      verdict === "safe"    ? "Выглядит безопасно — признаков угрозы не найдено." :
+      verdict === "warning" ? "Есть подозрительные признаки. Проверьте по независимому каналу, прежде чем действовать." :
+                              "Похоже на мошенничество. Не нажимайте, не перезванивайте, не платите. Сверьтесь по официальному номеру, который нашли сами.",
   };
 }
